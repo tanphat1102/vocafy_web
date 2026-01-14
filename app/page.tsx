@@ -3,6 +3,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Navbar } from "@/components/layout/navbar";
+import { Footer } from "@/components/layout/footer";
+import { FadeInOnScroll } from "@/components/ui/fade-in-on-scroll";
 import {
   Sparkles,
   Languages,
@@ -15,77 +18,12 @@ import {
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/images/logoFull.png"
-              alt="Vocafy"
-              width={100}
-              height={32}
-              priority
-            />
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-8">
-            <Link
-              href="/"
-              className="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600 pb-1"
-            >
-              Home
-            </Link>
-            <Link
-              href="/about"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900"
-            >
-              About
-            </Link>
-            <Link
-              href="/courses"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900"
-            >
-              Courses
-            </Link>
-            <Link
-              href="/topic"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900"
-            >
-              Topic
-            </Link>
-            <Link
-              href="/ai-tutor"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900"
-            >
-              AI Tutor
-            </Link>
-            <Link
-              href="/contact"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900"
-            >
-              Contact
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <Link href="/login">
-              <Button variant="ghost" className="text-gray-700">
-                Login
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button className="bg-indigo-600 hover:bg-indigo-700">
-                Sign up
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
+          <FadeInOnScroll className="space-y-6">
             <Badge
               variant="secondary"
               className="bg-blue-100 text-indigo-600 hover:bg-blue-100 px-4 py-1.5"
@@ -144,18 +82,18 @@ export default function Home() {
                 <span className="ml-1 text-sm text-gray-600">4.5 rating</span>
               </div>
             </div>
-          </div>
+          </FadeInOnScroll>
 
-          <div className="relative">
+          <FadeInOnScroll delay={200} className="relative">
             <div className="aspect-video bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl shadow-xl"></div>
-          </div>
+          </FadeInOnScroll>
         </div>
       </section>
 
       {/* Why Choose VOCAFY Section */}
       <section className="bg-white py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <FadeInOnScroll className="text-center mb-12">
             <Badge
               variant="secondary"
               className="bg-blue-100 text-indigo-600 hover:bg-blue-100 mb-4"
@@ -169,64 +107,72 @@ export default function Home() {
               Experience a smarter way to build your vocabulary with
               cutting-edge technology and proven learning methodologies.
             </p>
-          </div>
+          </FadeInOnScroll>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Feature 1 */}
-            <Card className="border-2 hover:border-indigo-200 transition-all hover:shadow-lg">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto">
-                  <Sparkles className="w-7 h-7 text-indigo-600" />
-                </div>
-                <h3 className="font-bold text-lg">AI-Powered Learning</h3>
-                <p className="text-gray-600 text-sm">
-                  Smart algorithms adapt to your learning pace and style for
-                  maximum retention.
-                </p>
-              </CardContent>
-            </Card>
+            <FadeInOnScroll delay={0}>
+              <Card className="border-2 hover:border-indigo-200 transition-all hover:shadow-lg h-full">
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center mx-auto">
+                    <Sparkles className="w-7 h-7 text-indigo-600" />
+                  </div>
+                  <h3 className="font-bold text-lg">AI-Powered Learning</h3>
+                  <p className="text-gray-600 text-sm">
+                    Smart algorithms adapt to your learning pace and style for
+                    maximum retention.
+                  </p>
+                </CardContent>
+              </Card>
+            </FadeInOnScroll>
 
             {/* Feature 2 */}
-            <Card className="border-2 hover:border-indigo-200 transition-all hover:shadow-lg">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                  <Languages className="w-7 h-7 text-blue-600" />
-                </div>
-                <h3 className="font-bold text-lg">Japanese & English</h3>
-                <p className="text-gray-600 text-sm">
-                  Master JLPT vocabulary and professional English for your
-                  career growth.
-                </p>
-              </CardContent>
-            </Card>
+            <FadeInOnScroll delay={100}>
+              <Card className="border-2 hover:border-indigo-200 transition-all hover:shadow-lg h-full">
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
+                    <Languages className="w-7 h-7 text-blue-600" />
+                  </div>
+                  <h3 className="font-bold text-lg">Japanese & English</h3>
+                  <p className="text-gray-600 text-sm">
+                    Master JLPT vocabulary and professional English for your
+                    career growth.
+                  </p>
+                </CardContent>
+              </Card>
+            </FadeInOnScroll>
 
             {/* Feature 3 */}
-            <Card className="border-2 hover:border-indigo-200 transition-all hover:shadow-lg">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-                  <RefreshCcw className="w-7 h-7 text-emerald-600" />
-                </div>
-                <h3 className="font-bold text-lg">Smart Repetition</h3>
-                <p className="text-gray-600 text-sm">
-                  Spaced repetition system ensures long-term memory and
-                  efficient learning.
-                </p>
-              </CardContent>
-            </Card>
+            <FadeInOnScroll delay={200}>
+              <Card className="border-2 hover:border-indigo-200 transition-all hover:shadow-lg h-full">
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
+                    <RefreshCcw className="w-7 h-7 text-emerald-600" />
+                  </div>
+                  <h3 className="font-bold text-lg">Smart Repetition</h3>
+                  <p className="text-gray-600 text-sm">
+                    Spaced repetition system ensures long-term memory and
+                    efficient learning.
+                  </p>
+                </CardContent>
+              </Card>
+            </FadeInOnScroll>
 
             {/* Feature 4 */}
-            <Card className="border-2 hover:border-indigo-200 transition-all hover:shadow-lg">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
-                  <Globe className="w-7 h-7 text-purple-600" />
-                </div>
-                <h3 className="font-bold text-lg">Learn Anywhere</h3>
-                <p className="text-gray-600 text-sm">
-                  Access on web or mobile. Sync progress across all your devices
-                  seamlessly.
-                </p>
-              </CardContent>
-            </Card>
+            <FadeInOnScroll delay={300}>
+              <Card className="border-2 hover:border-indigo-200 transition-all hover:shadow-lg h-full">
+                <CardContent className="p-6 text-center space-y-4">
+                  <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
+                    <Globe className="w-7 h-7 text-purple-600" />
+                  </div>
+                  <h3 className="font-bold text-lg">Learn Anywhere</h3>
+                  <p className="text-gray-600 text-sm">
+                    Access on web or mobile. Sync progress across all your devices
+                    seamlessly.
+                  </p>
+                </CardContent>
+              </Card>
+            </FadeInOnScroll>
           </div>
         </div>
       </section>
@@ -235,7 +181,7 @@ export default function Home() {
       <section className="py-16 md:py-24 bg-gradient-to-b from-white to-blue-50">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6">
+            <FadeInOnScroll className="space-y-6">
               <Badge
                 variant="secondary"
                 className="bg-blue-100 text-indigo-600 hover:bg-blue-100"
@@ -257,35 +203,23 @@ export default function Home() {
               </p>
 
               <div className="flex flex-wrap gap-4 pt-4">
-                <Button className="bg-indigo-600 hover:bg-indigo-700">
-                  Learn More
-                </Button>
+                <Link href="/introduction">
+                  <Button className="bg-indigo-600 hover:bg-indigo-700">
+                    Learn More
+                  </Button>
+                </Link>
                 <Button variant="outline">Contact Us</Button>
               </div>
-            </div>
+            </FadeInOnScroll>
 
-            <div className="relative">
+            <FadeInOnScroll delay={200} className="relative">
               <div className="aspect-video bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl shadow-xl"></div>
-            </div>
+            </FadeInOnScroll>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <Image
-              src="/images/logoWhite.png"
-              alt="Vocafy"
-              width={100}
-              height={32}
-              className="mx-auto mb-4"
-            />
-            <p className="text-gray-400">© 2026 Vocafy. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
