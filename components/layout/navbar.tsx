@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { auth } from "@/lib/firebase";
-import { authService } from "@/data/services/authService";
+import { authService } from "@/services/authService";
 import {
   onAuthStateChanged,
   type User,
