@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import type { Analytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -24,10 +24,14 @@ const app =
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Analytics is only available in the browser
-let analytics;
-if (typeof window !== "undefined") {
+// Analytics is only available in the browser.
+// Keep it lazy to avoid SSR/runtime issues.
+let analytics: Analytics | undefined;
+async function initAnalytics() {
+  if (analytics || typeof window === "undefined") return analytics;
+  const { getAnalytics } = await import("firebase/analytics");
   analytics = getAnalytics(app);
+  return analytics;
 }
 
-export { app, auth, db, analytics };
+export { app, auth, db, analytics, initAnalytics };
