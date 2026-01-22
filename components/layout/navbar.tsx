@@ -6,8 +6,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { auth } from "@/lib/firebase";
+import { auth, isFirebaseConfigured } from "@/lib/firebase";
 import { authService } from "@/services/authService";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   onAuthStateChanged,
   type User,
@@ -16,8 +17,8 @@ import {
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/introduction", label: "About" },
-  { href: "/courses", label: "Courses" },
-  { href: "/topic", label: "Topic" },
+  { href: "/syllabus", label: "Syllabus" },
+  { href: "/extension", label: "Extension" },
   { href: "/ai-tutor", label: "AI Tutor" },
   { href: "/contact", label: "Contact" },
 ];
@@ -28,6 +29,7 @@ export function Navbar() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   useEffect(() => {
+    if (!auth || !isFirebaseConfigured) return;
     const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
       setUser(nextUser);
     });
@@ -58,15 +60,16 @@ export function Navbar() {
   };
 
   return (
-    <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+    <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 transition-colors duration-300">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center">
+        <Link href="/" className="flex items-center group">
           <Image
             src="/images/logoFull.png"
             alt="Vocafy"
             width={100}
             height={32}
             priority
+            className="group-hover:scale-105 transition-transform duration-300"
           />
         </Link>
 
@@ -78,22 +81,30 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "text-sm font-medium transition-colors",
+                  "text-sm font-medium transition-all duration-300 relative group",
                   isActive
-                    ? "text-indigo-600 border-b-2 border-indigo-600 pb-1"
-                    : "text-gray-600 hover:text-gray-900"
+                    ? "text-indigo-600 dark:text-indigo-400"
+                    : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                 )}
               >
                 {link.label}
+                <span 
+                  className={cn(
+                    "absolute -bottom-1 left-0 h-0.5 bg-indigo-600 dark:bg-indigo-400 transition-all duration-300",
+                    isActive ? "w-full" : "w-0 group-hover:w-full"
+                  )} 
+                />
               </Link>
             );
           })}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          
           {user ? (
             <div className="flex items-center gap-3">
-              <span className="hidden sm:inline text-sm text-gray-700">
+              <span className="hidden sm:inline text-sm text-gray-700 dark:text-gray-300">
                 {user.displayName ?? user.email ?? "Signed in"}
               </span>
               <Button
@@ -101,7 +112,7 @@ export function Navbar() {
                 variant="outline"
                 onClick={handleLogout}
                 disabled={isAuthLoading}
-                className="rounded-full"
+                className="rounded-full dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
               >
                 Logout
               </Button>
@@ -112,7 +123,7 @@ export function Navbar() {
               variant="outline"
               onClick={handleGoogleLogin}
               disabled={isAuthLoading}
-              className="rounded-full border-gray-200 bg-white text-gray-800 hover:bg-gray-50"
+              className="rounded-full border-gray-200 bg-white text-gray-800 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
                 <path
