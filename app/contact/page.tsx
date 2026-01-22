@@ -1,13 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { FadeInOnScroll } from "@/components/ui/fade-in-on-scroll";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
+import { ParticleField } from "@/components/ui/floating-elements";
 import {
   Users,
   Mail,
@@ -17,24 +14,23 @@ import {
   Instagram,
   Linkedin,
   Github,
-  Globe,
   GraduationCap,
   Crown,
   Code,
   Palette,
   Megaphone,
   Smartphone,
-  BookOpen,
+  X,
 } from "lucide-react";
 
-// Team member data - Fill in your information
+// Team member data
 const mentor = {
   name: "Nguyễn Văn A",
   role: "Mentor",
-  mssv: "Giảng viên hướng dẫn",
+  title: "Giảng viên hướng dẫn",
   avatar: "/images/team/mentor.jpg",
   email: "mentor@fpt.edu.vn",
-  color: "slate",
+  description: "Giảng viên Khoa Công nghệ Thông tin, FPT University. Chuyên gia về AI và Machine Learning với hơn 10 năm kinh nghiệm.",
 };
 
 const teamMembers = [
@@ -43,8 +39,8 @@ const teamMembers = [
     role: "CEO",
     mssv: "SE182138",
     avatar: "/images/team/ceo.jpg",
-    description: "Founder & Chief Executive Officer",
-    color: "indigo",
+    description: "Founder & Chief Executive Officer. Định hướng chiến lược và phát triển sản phẩm Vocafy.",
+    color: "from-amber-400 to-orange-500",
     icon: Crown,
   },
   {
@@ -52,466 +48,359 @@ const teamMembers = [
     role: "Tech Lead",
     mssv: "SE182221",
     avatar: "/images/team/techlead.jpg",
-    description: "Technical Lead & Backend Developer",
-    color: "blue",
+    description: "Technical Lead & Backend Developer. Kiến trúc hệ thống và phát triển API.",
+    color: "from-blue-400 to-indigo-500",
     icon: Code,
+  },
+  {
+    name: "Nguyễn Gia Khiêm",
+    role: "Developer",
+    mssv: "SE182188",
+    avatar: "/images/team/mobile1.jpg",
+    description: "iOS & Android Developer. Phát triển ứng dụng mobile cho Vocafy.",
+    color: "from-emerald-400 to-teal-500",
+    icon: Smartphone,
+  },
+  {
+    name: "Lê Trúc Ân",
+    role: "Developer",
+    mssv: "SE184186",
+    avatar: "/images/team/mobile2.jpg",
+    description: "iOS & Android Developer. Phát triển tính năng và tối ưu hiệu suất app.",
+    color: "from-cyan-400 to-blue-500",
+    icon: Smartphone,
   },
   {
     name: "Đặng Tuấn Sơn",
     role: "UX/UI Designer",
     mssv: "SE183892",
     avatar: "/images/team/designer.jpg",
-    description: "User Experience & Interface Designer",
-    color: "purple",
+    description: "User Experience & Interface Designer. Thiết kế giao diện và trải nghiệm người dùng.",
+    color: "from-purple-400 to-pink-500",
     icon: Palette,
   },
   {
     name: "Đào Phương Thảo",
-    role: "Marketing",
+    role: "Trưởng phòng Marketing",
     mssv: "SS170172",
     avatar: "/images/team/marketing.jpg",
-    description: "Marketing & Communications",
-    color: "pink",
+    description: "Marketing & Communications. Chiến lược marketing và phát triển cộng đồng.",
+    color: "from-pink-400 to-rose-500",
     icon: Megaphone,
-  },
-  {
-    name: "Nguyễn Gia Khiêm",
-    role: "Mobile Developer",
-    mssv: "SE182188",
-    avatar: "/images/team/mobile1.jpg",
-    description: "iOS & Android Developer",
-    color: "emerald",
-    icon: Smartphone,
-  },
-  {
-    name: "Lê Trúc Ân",
-    role: "Mobile Developer",
-    mssv: "SE184186",
-    avatar: "/images/team/mobile2.jpg",
-    description: "iOS & Android Developer",
-    color: "teal",
-    icon: Smartphone,
   },
 ];
 
 const socialLinks = [
-  { name: "Facebook", icon: Facebook, url: "https://facebook.com/vocafy", color: "blue" },
-  { name: "Instagram", icon: Instagram, url: "https://instagram.com/vocafy", color: "pink" },
-  { name: "LinkedIn", icon: Linkedin, url: "https://linkedin.com/company/vocafy", color: "sky" },
-  { name: "GitHub", icon: Github, url: "https://github.com/vocafy", color: "gray" },
+  { name: "Facebook", icon: Facebook, url: "#", color: "hover:text-blue-500" },
+  { name: "Instagram", icon: Instagram, url: "#", color: "hover:text-pink-500" },
+  { name: "LinkedIn", icon: Linkedin, url: "#", color: "hover:text-sky-500" },
+  { name: "GitHub", icon: Github, url: "#", color: "hover:text-gray-900 dark:hover:text-white" },
 ];
 
-const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
-  indigo: { bg: "bg-indigo-500", text: "text-indigo-600", border: "border-indigo-300", light: "bg-indigo-100" },
-  blue: { bg: "bg-blue-500", text: "text-blue-600", border: "border-blue-300", light: "bg-blue-100" },
-  purple: { bg: "bg-purple-500", text: "text-purple-600", border: "border-purple-300", light: "bg-purple-100" },
-  pink: { bg: "bg-pink-500", text: "text-pink-600", border: "border-pink-300", light: "bg-pink-100" },
-  emerald: { bg: "bg-emerald-500", text: "text-emerald-600", border: "border-emerald-300", light: "bg-emerald-100" },
-  teal: { bg: "bg-teal-500", text: "text-teal-600", border: "border-teal-300", light: "bg-teal-100" },
-  slate: { bg: "bg-slate-500", text: "text-slate-600", border: "border-slate-300", light: "bg-slate-100" },
-  sky: { bg: "bg-sky-500", text: "text-sky-600", border: "border-sky-300", light: "bg-sky-100" },
-  gray: { bg: "bg-gray-700", text: "text-gray-600", border: "border-gray-300", light: "bg-gray-100" },
-};
+interface TeamMember {
+  name: string;
+  role: string;
+  mssv?: string;
+  avatar: string;
+  description: string;
+  color?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  title?: string;
+  email?: string;
+}
 
-export default function ContactPage() {
+function MemberCard({ member, onClick, index }: { member: TeamMember; onClick: () => void; index: number }) {
+  const Icon = member.icon || GraduationCap;
+  
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <Navbar />
+    <FadeInOnScroll delay={index * 100}>
+      <div 
+        onClick={onClick}
+        className="group cursor-pointer"
+      >
+        {/* Avatar Container */}
+        <div className="relative mx-auto w-32 h-32 md:w-40 md:h-40 mb-4">
+          {/* Gradient Ring */}
+          <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${member.color || 'from-slate-400 to-slate-600'} p-1 shadow-lg group-hover:shadow-2xl transition-all duration-500 group-hover:scale-105`}>
+            <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden flex items-center justify-center">
+              <Icon className="w-12 h-12 text-gray-500 dark:text-gray-400" />
+            </div>
+          </div>
+          
+          {/* Hover Glow Effect */}
+          <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${member.color || 'from-slate-400 to-slate-600'} opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-500`} />
+        </div>
+        
+        {/* Info */}
+        <div className="text-center">
+          <h3 className="font-bold text-lg text-white drop-shadow-lg group-hover:text-indigo-200 transition-colors">
+            {member.name}
+          </h3>
+          <p className="text-indigo-200 text-sm font-medium">{member.role}</p>
+        </div>
+      </div>
+    </FadeInOnScroll>
+  );
+}
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-20">
-        <FadeInOnScroll className="text-center max-w-3xl mx-auto">
-          <Badge
-            variant="secondary"
-            className="bg-indigo-100 text-indigo-600 hover:bg-indigo-100 mb-4"
-          >
-            <Users className="w-4 h-4 mr-2 inline" />
-            Contact Us
-          </Badge>
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-            Đội Ngũ{" "}
-            <span className="text-indigo-600">Vocafy</span>
-          </h1>
-          <p className="text-lg text-gray-600 mt-4 leading-relaxed">
-            Chúng tôi là nhóm sinh viên FPT University đam mê công nghệ và giáo dục
+function MemberModal({ member, onClose }: { member: TeamMember | null; onClose: () => void }) {
+  if (!member) return null;
+  
+  const Icon = member.icon || GraduationCap;
+  
+  return (
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl max-w-md w-full p-8 relative animate-bounce-in"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close Button */}
+        <button 
+          onClick={onClose}
+          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        
+        {/* Avatar */}
+        <div className="flex justify-center mb-6">
+          <div className={`w-32 h-32 rounded-full bg-gradient-to-br ${member.color || 'from-slate-400 to-slate-600'} p-1 shadow-xl`}>
+            <div className="w-full h-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden flex items-center justify-center">
+              <Icon className="w-16 h-16 text-gray-500" />
+            </div>
+          </div>
+        </div>
+        
+        {/* Info */}
+        <div className="text-center space-y-3">
+          <h2 className="text-2xl font-bold dark:text-white">{member.name}</h2>
+          <p className={`inline-block px-4 py-1 rounded-full text-white text-sm font-medium bg-gradient-to-r ${member.color || 'from-slate-400 to-slate-600'}`}>
+            {member.role}
           </p>
-        </FadeInOnScroll>
-      </section>
-
-      {/* Mentor Section */}
-      <section className="container mx-auto px-4 pb-12">
-        <FadeInOnScroll>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-slate-600" />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold">Mentor Hướng Dẫn</h2>
-          </div>
-        </FadeInOnScroll>
-
-        <FadeInOnScroll delay={100}>
-          <Card className="max-w-md mx-auto border-2 border-slate-200 bg-gradient-to-br from-slate-50 to-gray-50">
-            <CardContent className="p-6 text-center">
-              <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-slate-200">
-                <AvatarImage src={mentor.avatar} alt={mentor.name} />
-                <AvatarFallback className="bg-slate-500 text-white text-2xl">
-                  {mentor.name.split(" ").map(n => n[0]).join("").slice(-2)}
-                </AvatarFallback>
-              </Avatar>
-              <Badge className="bg-slate-500 hover:bg-slate-600 mb-2">
-                <GraduationCap className="w-3 h-3 mr-1" />
-                {mentor.role}
-              </Badge>
-              <h3 className="text-xl font-bold mt-2">{mentor.name}</h3>
-              <p className="text-sm text-gray-500">{mentor.mssv}</p>
-              <p className="text-sm text-gray-600 mt-2">{mentor.email}</p>
-            </CardContent>
-          </Card>
-        </FadeInOnScroll>
-      </section>
-
-      {/* Team Structure */}
-      <section className="bg-white py-12">
-        <div className="container mx-auto px-4">
-          <FadeInOnScroll>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                <Users className="w-5 h-5 text-indigo-600" />
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold">Cấu Trúc Công Ty</h2>
-            </div>
-          </FadeInOnScroll>
-
-          {/* Desktop Hierarchy View */}
-          <div className="hidden md:block">
-            {/* CEO - Top */}
-            <div className="flex justify-center mb-4">
-              <FadeInOnScroll delay={0}>
-                <MemberCard member={teamMembers[0]} />
-              </FadeInOnScroll>
-            </div>
-
-            {/* Connecting line from CEO */}
-            <div className="flex justify-center mb-4">
-              <div className="w-px h-8 bg-gray-300" />
-            </div>
-
-            {/* Horizontal line */}
-            <div className="flex justify-center mb-4">
-              <div className="w-2/3 max-w-2xl h-px bg-gray-300" />
-            </div>
-
-            {/* Level 2: Tech Lead, UX/UI, Marketing */}
-            <div className="grid grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {/* Tech Lead Column */}
-              <div className="flex flex-col items-center">
-                <div className="w-px h-4 bg-gray-300 mb-4" />
-                <FadeInOnScroll delay={80}>
-                  <MemberCard member={teamMembers[1]} />
-                </FadeInOnScroll>
-                {/* Connector down to Mobile Devs row (rendered below grid) */}
-                <div className="w-px h-6 bg-gray-300 mt-4" />
-              </div>
-
-              {/* UX/UI Designer Column */}
-              <div className="flex flex-col items-center">
-                <div className="w-px h-4 bg-gray-300 mb-4" />
-                <FadeInOnScroll delay={160}>
-                  <MemberCard member={teamMembers[2]} />
-                </FadeInOnScroll>
-              </div>
-
-              {/* Marketing Column */}
-              <div className="flex flex-col items-center">
-                <div className="w-px h-4 bg-gray-300 mb-4" />
-                <FadeInOnScroll delay={240}>
-                  <MemberCard member={teamMembers[3]} />
-                </FadeInOnScroll>
-              </div>
-            </div>
-
-            {/* Horizontal connector under Tech Lead to Mobile Devs */}
-            <div className="grid grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <div className="flex flex-col items-center">
-                <div className="w-40 h-px bg-gray-300" />
-              </div>
-              <div />
-              <div />
-            </div>
-
-            {/* Mobile Developers - full width row to match card sizes */}
-            <div className="max-w-4xl mx-auto mt-4">
-              <div className="grid grid-cols-2 gap-6">
-                <FadeInOnScroll delay={320}>
-                  <MemberCard member={teamMembers[4]} />
-                </FadeInOnScroll>
-                <FadeInOnScroll delay={400}>
-                  <MemberCard member={teamMembers[5]} />
-                </FadeInOnScroll>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile View - Simple list */}
-          <div className="md:hidden space-y-4">
-            {/* CEO */}
-            <FadeInOnScroll delay={0}>
-              <MemberCard member={teamMembers[0]} />
-            </FadeInOnScroll>
-            
-            {/* Divider */}
-            <div className="flex items-center gap-2 py-2">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400">Báo cáo trực tiếp</span>
-              <div className="flex-1 h-px bg-gray-200" />
-            </div>
-
-            {/* Tech Lead */}
-            <FadeInOnScroll delay={80}>
-              <MemberCard member={teamMembers[1]} />
-            </FadeInOnScroll>
-
-            {/* Mobile Devs under Tech Lead */}
-            <div className="pl-4 border-l-2 border-blue-200 space-y-3">
-              <p className="text-xs text-gray-500 font-medium">Dưới quyền Tech Lead:</p>
-              <FadeInOnScroll delay={320}>
-                <MemberCard member={teamMembers[4]} />
-              </FadeInOnScroll>
-              <FadeInOnScroll delay={400}>
-                <MemberCard member={teamMembers[5]} />
-              </FadeInOnScroll>
-            </div>
-
-            {/* Other members */}
-            <FadeInOnScroll delay={160}>
-              <MemberCard member={teamMembers[2]} />
-            </FadeInOnScroll>
-            <FadeInOnScroll delay={240}>
-              <MemberCard member={teamMembers[3]} />
-            </FadeInOnScroll>
-          </div>
+          {member.mssv && (
+            <p className="text-gray-500 dark:text-gray-400 text-sm">MSSV: {member.mssv}</p>
+          )}
+          {member.title && (
+            <p className="text-gray-500 dark:text-gray-400 text-sm">{member.title}</p>
+          )}
+          <p className="text-gray-600 dark:text-gray-300 leading-relaxed pt-2">
+            {member.description}
+          </p>
+          {member.email && (
+            <a 
+              href={`mailto:${member.email}`}
+              className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline mt-4"
+            >
+              <Mail className="w-4 h-4" />
+              {member.email}
+            </a>
+          )}
         </div>
-      </section>
-
-      {/* Contact Information */}
-      <section className="container mx-auto px-4 py-12">
-        <FadeInOnScroll>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <Mail className="w-5 h-5 text-blue-600" />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold">Thông Tin Liên Hệ</h2>
-          </div>
-        </FadeInOnScroll>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Email */}
-          <FadeInOnScroll delay={0}>
-            <Card className="h-full hover:shadow-lg transition-shadow border-t-4 border-t-blue-500">
-              <CardHeader className="pb-2">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-2">
-                  <Mail className="w-6 h-6 text-blue-600" />
-                </div>
-                <CardTitle className="text-blue-600">Email</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <a href="mailto:vocafy.exesp26@gmail.com" className="block text-gray-600 hover:text-blue-600 transition-colors">
-                  vocafy.exesp26@gmail.com
-                </a>
-                <a href="mailto:vocafy.exesp26@gmail.com" className="block text-gray-600 hover:text-blue-600 transition-colors">
-                  vocafy.exesp26@gmail.com
-                </a>
-              </CardContent>
-            </Card>
-          </FadeInOnScroll>
-
-          {/* Phone */}
-          <FadeInOnScroll delay={100}>
-            <Card className="h-full hover:shadow-lg transition-shadow border-t-4 border-t-emerald-500">
-              <CardHeader className="pb-2">
-                <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-2">
-                  <Phone className="w-6 h-6 text-emerald-600" />
-                </div>
-                <CardTitle className="text-emerald-600">Điện Thoại</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <p className="text-gray-600">+84 000 363 363</p>
-                <p className="text-sm text-gray-400">Thứ 2 - Thứ 6: 9:00 - 17:00</p>
-              </CardContent>
-            </Card>
-          </FadeInOnScroll>
-
-          {/* Address */}
-          <FadeInOnScroll delay={200}>
-            <Card className="h-full hover:shadow-lg transition-shadow border-t-4 border-t-purple-500">
-              <CardHeader className="pb-2">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-2">
-                  <MapPin className="w-6 h-6 text-purple-600" />
-                </div>
-                <CardTitle className="text-purple-600">Địa Chỉ</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  FPT University<br />
-                  Khu Công nghệ cao Hồ Chí Minh<br />
-                  XaVaLo
-                </p>
-              </CardContent>
-            </Card>
-          </FadeInOnScroll>
-        </div>
-      </section>
-
-      {/* Social Media */}
-      <section className="bg-gradient-to-r from-indigo-50 to-purple-50 py-12">
-        <div className="container mx-auto px-4">
-          <FadeInOnScroll>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                <Globe className="w-5 h-5 text-indigo-600" />
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold">Mạng Xã Hội</h2>
-            </div>
-          </FadeInOnScroll>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {socialLinks.map((social, i) => (
-              <FadeInOnScroll key={social.name} delay={i * 80}>
-                <a href={social.url} target="_blank" rel="noopener noreferrer">
-                  <Card className="hover:shadow-lg transition-all hover:-translate-y-1 cursor-pointer bg-white">
-                    <CardContent className="p-6 text-center">
-                      <div className={`w-14 h-14 ${colorClasses[social.color]?.light || "bg-gray-100"} rounded-full flex items-center justify-center mx-auto mb-3`}>
-                        <social.icon className={`w-7 h-7 ${colorClasses[social.color]?.text || "text-gray-600"}`} />
-                      </div>
-                      <p className="font-semibold">{social.name}</p>
-                      <p className="text-sm text-gray-500">@vocafy</p>
-                    </CardContent>
-                  </Card>
-                </a>
-              </FadeInOnScroll>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About Project */}
-      <section className="container mx-auto px-4 py-12">
-        <FadeInOnScroll>
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-amber-600" />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold">Về Dự Án</h2>
-          </div>
-        </FadeInOnScroll>
-
-        <FadeInOnScroll delay={100}>
-          <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-none">
-            <CardContent className="p-8">
-              <div className="grid md:grid-cols-2 gap-8 items-center">
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold text-amber-700">Vocafy - EXE201</h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    Vocafy là dự án khởi nghiệp của nhóm sinh viên FPT University, 
-                    được phát triển trong khuôn khổ môn học EXE201 - Experiential Entrepreneurship 1.
-                  </p>
-                  <p className="text-gray-600 leading-relaxed">
-                    Mục tiêu của chúng tôi là xây dựng một nền tảng học từ vựng thông minh, 
-                    giúp người dùng Việt Nam học tiếng Anh và tiếng Nhật một cách hiệu quả 
-                    thông qua công nghệ AI và phương pháp Spaced Repetition.
-                  </p>
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    <Badge variant="outline" className="border-amber-300">FPT University</Badge>
-                    <Badge variant="outline" className="border-amber-300">EXE201</Badge>
-                    <Badge variant="outline" className="border-amber-300">Spring 2026</Badge>
-                  </div>
-                </div>
-                <div className="flex justify-center">
-                  <div className="w-48 h-48 bg-gradient-to-br from-amber-200 to-orange-200 rounded-2xl flex items-center justify-center">
-                    <span className="text-6xl">🎓</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </FadeInOnScroll>
-      </section>
-
-      {/* CTA Section */}
-      <section className="container mx-auto px-4 pb-16">
-        <FadeInOnScroll>
-          <Card className="bg-gradient-to-r from-indigo-600 to-purple-600 border-none text-white">
-            <CardContent className="p-8 text-center">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                Sẵn sàng bắt đầu học cùng Vocafy?
-              </h3>
-              <p className="text-indigo-100 mb-6 max-w-2xl mx-auto">
-                Đăng ký ngay để trải nghiệm phương pháp học từ vựng hiệu quả với AI
-              </p>
-              <Button size="lg" className="bg-white text-indigo-600 hover:bg-indigo-50">
-                Bắt đầu miễn phí
-              </Button>
-            </CardContent>
-          </Card>
-        </FadeInOnScroll>
-      </section>
-
-      <Footer />
+      </div>
     </div>
   );
 }
 
-// Member Card Component
-function MemberCard({ member, isSmall = false }: { member: typeof teamMembers[0]; isSmall?: boolean }) {
-  const colors = colorClasses[member.color] || colorClasses.indigo;
-  const Icon = member.icon;
+export default function ContactPage() {
+  const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
 
-  if (isSmall) {
-    return (
-      <Card className={`hover:shadow-lg transition-all hover:-translate-y-1 border-l-4 overflow-hidden ${colors.border.replace("border", "border-l")}`}>
-        <CardContent className="p-3 flex items-center gap-3">
-          <Avatar className={`w-10 h-10 ring-2 ${colors.light} shrink-0`}>
-            <AvatarImage src={member.avatar} alt={member.name} />
-            <AvatarFallback className={`${colors.bg} text-white text-xs`}>
-              {member.name.split(" ").map(n => n[0]).join("").slice(-2)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-semibold text-sm break-words">{member.name}</h3>
-              <Badge className={`${colors.bg} hover:${colors.bg} text-[10px] px-1.5 py-0`}>
-                {member.role}
-              </Badge>
-            </div>
-            <p className="text-xs text-gray-500 font-mono break-words">{member.mssv}</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const ceo = teamMembers.find((m) => m.role === "CEO");
+  const techLead = teamMembers.find((m) => m.role === "Tech Lead");
+  const marketingLead = teamMembers.find((m) => m.role === "Trưởng phòng Marketing");
+  const developers = teamMembers.filter((m) => m.role === "Developer");
+  const designer = teamMembers.find((m) => m.role === "UX/UI Designer");
 
   return (
-    <Card className={`h-full hover:shadow-lg transition-all hover:-translate-y-1 border-l-4 overflow-hidden ${colors.border.replace("border", "border-l")}`}>
-      <CardContent className="p-4 flex items-start gap-4">
-        <Avatar className={`w-14 h-14 ring-2 ${colors.light} shrink-0`}>
-          <AvatarImage src={member.avatar} alt={member.name} />
-          <AvatarFallback className={`${colors.bg} text-white text-sm`}>
-            {member.name.split(" ").map(n => n[0]).join("").slice(-2)}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div className="min-w-0 flex-1">
-          <Badge className={`${colors.bg} hover:${colors.bg} mb-1.5`}>
-            <Icon className="w-3 h-3 mr-1" />
-            {member.role}
-          </Badge>
-          
-          <h3 className="font-bold break-words">{member.name}</h3>
-          <p className="text-xs text-gray-500 font-mono break-words">{member.mssv}</p>
-          <p className="text-sm text-gray-600 mt-1 break-words">{member.description}</p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-indigo-950 relative overflow-hidden">
+      <Navbar />
+
+      {/* Full Screen Team Section */}
+      <section className="min-h-screen flex flex-col justify-center relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/50 via-gray-900/80 to-gray-900" />
+          <ParticleField particleCount={50} />
+          {/* Decorative circles */}
+          <div className="absolute top-20 left-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="container mx-auto px-4 py-16 relative z-10">
+          {/* Header */}
+          <FadeInOnScroll className="text-center mb-16">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-2xl">
+              ĐỘI NGŨ{" "}
+              <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                VOCAFY
+              </span>
+            </h1>
+            <p className="text-lg md:text-xl text-indigo-200 max-w-2xl mx-auto leading-relaxed">
+              Những con người đam mê công nghệ và giáo dục, cùng nhau xây dựng 
+              nền tảng học từ vựng thông minh cho cộng đồng.
+            </p>
+          </FadeInOnScroll>
+
+          {/* Mentor */}
+          <FadeInOnScroll delay={100} className="flex justify-center mb-12">
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <GraduationCap className="w-6 h-6 text-amber-400" />
+                <span className="text-amber-400 font-semibold tracking-wider uppercase text-sm">Mentor Hướng Dẫn</span>
+              </div>
+              <MemberCard 
+                member={{...mentor, color: 'from-amber-400 to-orange-600'}} 
+                onClick={() => setSelectedMember({...mentor, color: 'from-amber-400 to-orange-600'})}
+                index={0}
+              />
+            </div>
+          </FadeInOnScroll>
+
+          {/* Divider */}
+          <div className="flex items-center justify-center gap-4 my-8">
+            <div className="h-px w-24 bg-gradient-to-r from-transparent to-indigo-500/50" />
+            <Users className="w-6 h-6 text-indigo-400" />
+            <span className="text-indigo-400 font-semibold tracking-wider uppercase text-sm">Thành Viên</span>
+            <div className="h-px w-24 bg-gradient-to-l from-transparent to-indigo-500/50" />
+          </div>
+
+          {/* Team Org Tree */}
+          <div className="max-w-6xl mx-auto">
+            {/* CEO (under Mentor) */}
+            {ceo && (
+              <div className="text-center">
+                {/* Connector (desktop) */}
+                <div className="hidden md:flex flex-col items-center -mt-2 mb-4">
+                  <div className="w-px h-8 bg-indigo-500/40" />
+                </div>
+
+                <div className="flex justify-center">
+                  <MemberCard
+                    member={ceo}
+                    onClick={() => setSelectedMember(ceo)}
+                    index={1}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Level 2: Tech Lead + Marketing Head */}
+            <div className="mt-10">
+              {/* Branch connectors (desktop) */}
+              <div className="hidden md:flex flex-col items-center mb-6">
+                <div className="w-px h-10 bg-indigo-500/35" />
+                <div className="w-full max-w-3xl h-px bg-indigo-500/25" />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-10 md:gap-16">
+                {/* Tech Lead branch */}
+                <div className="relative">
+                  <div className="hidden md:block absolute left-1/2 -top-6 -translate-x-1/2 w-px h-6 bg-indigo-500/35" />
+
+                  {techLead && (
+                    <div className="flex justify-center">
+                      <MemberCard
+                        member={techLead}
+                        onClick={() => setSelectedMember(techLead)}
+                        index={2}
+                      />
+                    </div>
+                  )}
+
+                  {/* Level 3: Developers + Designer under Tech Lead */}
+                  <div className="mt-10">
+                    {/* Sub-branch connector (desktop) */}
+                    <div className="hidden md:flex flex-col items-center mb-6">
+                      <div className="w-px h-8 bg-indigo-500/30" />
+                      <div className="w-full max-w-md h-px bg-indigo-500/20" />
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 justify-items-center">
+                      {developers.map((dev, idx) => (
+                        <div key={dev.mssv} className="relative">
+                          <div className="hidden md:block absolute left-1/2 -top-6 -translate-x-1/2 w-px h-6 bg-indigo-500/25" />
+                          <MemberCard
+                            member={dev}
+                            onClick={() => setSelectedMember(dev)}
+                            index={3 + idx}
+                          />
+                        </div>
+                      ))}
+                      {designer && (
+                        <div className="relative">
+                          <div className="hidden md:block absolute left-1/2 -top-6 -translate-x-1/2 w-px h-6 bg-indigo-500/25" />
+                          <MemberCard
+                            member={designer}
+                            onClick={() => setSelectedMember(designer)}
+                            index={3 + developers.length}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Marketing Head branch */}
+                <div className="relative">
+                  <div className="hidden md:block absolute left-1/2 -top-6 -translate-x-1/2 w-px h-6 bg-indigo-500/35" />
+
+                  {marketingLead && (
+                    <div className="flex justify-center">
+                      <MemberCard
+                        member={marketingLead}
+                        onClick={() => setSelectedMember(marketingLead)}
+                        index={10}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact Info */}
+          <FadeInOnScroll delay={400} className="mt-16">
+            <div className="flex flex-wrap justify-center items-center gap-6 md:gap-12 text-indigo-200">
+              <a href="mailto:contact@vocafy.app" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Mail className="w-5 h-5" />
+                <span>contact@vocafy.app</span>
+              </a>
+              <a href="tel:+84123456789" className="flex items-center gap-2 hover:text-white transition-colors">
+                <Phone className="w-5 h-5" />
+                <span>+84 123 456 789</span>
+              </a>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5" />
+                <span>FPT University, HCMC</span>
+              </div>
+            </div>
+            
+            {/* Social Links */}
+            <div className="flex justify-center gap-4 mt-8">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.name}
+                  href={social.url}
+                  className={`w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/70 ${social.color} transition-all hover:scale-110 hover:bg-white/20`}
+                  aria-label={social.name}
+                >
+                  <social.icon className="w-5 h-5" />
+                </a>
+              ))}
+            </div>
+          </FadeInOnScroll>
+        </div>
+      </section>
+
+      {/* Modal */}
+      {selectedMember && (
+        <MemberModal member={selectedMember} onClose={() => setSelectedMember(null)} />
+      )}
+
+      <Footer />
+    </div>
   );
 }
 
