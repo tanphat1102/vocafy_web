@@ -5,7 +5,7 @@ import {
   type User,
 } from "firebase/auth";
 
-import { auth } from "@/lib/firebase";
+import { auth, isFirebaseConfigured } from "@/lib/firebase";
 
 export const AUTH_ID_TOKEN_STORAGE_KEY = "vocafy:idToken";
 
@@ -24,6 +24,10 @@ function removeIdTokenFromLocalStorage() {
 }
 
 async function signInWithGoogleAndSync(): Promise<{ user: User; idToken: string }> {
+  if (!auth || !isFirebaseConfigured) {
+    throw new Error("Firebase is not configured. Please set up environment variables.");
+  }
+  
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ prompt: "select_account" });
 
@@ -40,6 +44,10 @@ async function signInWithGoogleAndSync(): Promise<{ user: User; idToken: string 
 }
 
 async function logout(): Promise<void> {
+  if (!auth || !isFirebaseConfigured) {
+    removeIdTokenFromLocalStorage();
+    return;
+  }
   await signOut(auth);
   removeIdTokenFromLocalStorage();
 }

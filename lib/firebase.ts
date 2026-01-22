@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 import type { Analytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
@@ -16,22 +16,28 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-const app =
-  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// Check if Firebase config is valid (has API key)
+const isFirebaseConfigured = !!firebaseConfig.apiKey;
 
-// Initialize Firebase services
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Initialize Firebase only if configured
+let app: FirebaseApp | undefined;
+let auth: Auth | undefined;
+let db: Firestore | undefined;
+
+if (isFirebaseConfigured) {
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+  auth = getAuth(app);
+  db = getFirestore(app);
+}
 
 // Analytics is only available in the browser.
 // Keep it lazy to avoid SSR/runtime issues.
 let analytics: Analytics | undefined;
 async function initAnalytics() {
-  if (analytics || typeof window === "undefined") return analytics;
+  if (!app || analytics || typeof window === "undefined") return analytics;
   const { getAnalytics } = await import("firebase/analytics");
   analytics = getAnalytics(app);
   return analytics;
 }
 
-export { app, auth, db, analytics, initAnalytics };
+export { app, auth, db, analytics, initAnalytics, isFirebaseConfigured };
