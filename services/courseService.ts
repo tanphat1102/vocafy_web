@@ -2,40 +2,48 @@ import { apiClient } from "./apiClient";
 
 export interface Course {
   id: number;
-  topicId: number;
-  name: string;
+  topic_id: number;
+  title: string;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
+  sort_order: number;
+  is_active: boolean;
+  is_deleted: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface CourseCreateRequest {
-  topicId: number;
-  name: string;
+  title: string;
   description?: string;
+  sort_order: number;
+  vocabulary_ids?: number[];
 }
 
 export interface CourseUpdateRequest {
-  name?: string;
+  title: string;
   description?: string;
+  sort_order: number;
+  vocabulary_ids?: number[];
 }
 
 export interface CourseResponse {
-  data: Course;
+  success: boolean;
   message: string;
-  status: number;
+  result: Course;
 }
 
 export interface CourseListResponse {
-  data: {
-    content: Course[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    number: number;
-  };
+  success: boolean;
   message: string;
-  status: number;
+  result: {
+    content: Course[];
+    page: number;
+    size: number;
+    total_elements: number;
+    total_pages: number;
+    is_first: boolean;
+    is_last: boolean;
+  };
 }
 
 class CourseService {
@@ -76,7 +84,7 @@ class CourseService {
   /**
    * Delete course
    */
-  async delete(id: number): Promise<{ message: string; status: number }> {
+  async delete(id: number): Promise<CourseResponse> {
     return apiClient.delete(`/courses/${id}`);
   }
 }
