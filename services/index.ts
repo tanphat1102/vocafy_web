@@ -7,5 +7,6 @@ export * from "./topicService";
 export * from "./courseService";
 export * from "./enrollmentService";
 export * from "./learningSetService";
-export * from "./paymentService";
+export * from "./paymentMethodService";
+export * from "./premiumPackageService";
 export * from "./userService";

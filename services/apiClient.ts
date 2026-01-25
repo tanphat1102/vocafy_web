@@ -1,4 +1,4 @@
-import { AUTH_ID_TOKEN_STORAGE_KEY } from "./authService";
+import { AUTH_ACCESS_TOKEN_STORAGE_KEY } from "./authService";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BACKEND_URL ||
@@ -23,9 +23,9 @@ class ApiClient {
       "Content-Type": "application/json",
     };
 
-    // Get token from localStorage if available
+    // Get access token from localStorage if available
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem(AUTH_ID_TOKEN_STORAGE_KEY);
+      const token = localStorage.getItem(AUTH_ACCESS_TOKEN_STORAGE_KEY);
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }

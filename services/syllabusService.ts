@@ -1,49 +1,58 @@
 import { apiClient } from "./apiClient";
+import type { Topic } from "./topicService";
 
 export interface Syllabus {
   id: number;
-  name: string;
-  description?: string;
-  language: string;
-  level?: string;
+  title: string;
+  description: string;
+  total_days: number;
+  language_set: string;
   visibility: "PUBLIC" | "PRIVATE";
-  createdBy: number;
-  createdAt: string;
-  updatedAt: string;
+  source_type: string;
+  created_by_user_id: string;
+  active: boolean;
+  is_deleted: boolean;
+  created_at: string;
+  updated_at: string;
+  topics: Topic[] | null;
 }
 
 export interface SyllabusCreateRequest {
-  name: string;
+  title: string;
   description?: string;
-  language: string;
-  level?: string;
+  total_days: number;
+  language_set: string;
   visibility: "PUBLIC" | "PRIVATE";
+  source_type?: string;
 }
 
 export interface SyllabusUpdateRequest {
-  name?: string;
+  title?: string;
   description?: string;
-  language?: string;
-  level?: string;
+  total_days?: number;
+  language_set?: string;
   visibility?: "PUBLIC" | "PRIVATE";
+  source_type?: string;
 }
 
 export interface SyllabusResponse {
-  data: Syllabus;
+  success: boolean;
   message: string;
-  status: number;
+  result: Syllabus;
 }
 
 export interface SyllabusListResponse {
-  data: {
-    content: Syllabus[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    number: number;
-  };
+  success: boolean;
   message: string;
-  status: number;
+  result: {
+    content: Syllabus[];
+    page: number;
+    size: number;
+    total_elements: number;
+    total_pages: number;
+    is_first: boolean;
+    is_last: boolean;
+  };
 }
 
 class SyllabusService {
@@ -84,7 +93,7 @@ class SyllabusService {
   /**
    * Delete syllabus
    */
-  async delete(id: number): Promise<{ message: string; status: number }> {
+  async delete(id: number): Promise<SyllabusResponse> {
     return apiClient.delete(`/syllabus/${id}`);
   }
 }

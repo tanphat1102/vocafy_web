@@ -1,44 +1,54 @@
 import { apiClient } from "./apiClient";
+import type { Course } from "./courseService";
 
 export interface Topic {
   id: number;
-  syllabusId: number;
-  name: string;
+  syllabus_id: number;
+  title: string;
   description?: string;
-  dayOfLearning: number;
-  createdAt: string;
-  updatedAt: string;
+  total_days: number;
+  sort_order: number;
+  is_active: boolean;
+  is_deleted: boolean;
+  courses: Course[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TopicCreateRequest {
-  syllabusId: number;
-  name: string;
+  title: string;
   description?: string;
-  dayOfLearning: number;
+  total_days: number;
+  sort_order?: number;
+  course_ids?: number[];
 }
 
 export interface TopicUpdateRequest {
-  name?: string;
+  title: string;
   description?: string;
-  dayOfLearning?: number;
+  total_days: number;
+  sort_order?: number;
+  course_ids?: number[];
 }
 
 export interface TopicResponse {
-  data: Topic;
+  success: boolean;
   message: string;
-  status: number;
+  result: Topic;
 }
 
 export interface TopicListResponse {
-  data: {
-    content: Topic[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    number: number;
-  };
+  success: boolean;
   message: string;
-  status: number;
+  result: {
+    content: Topic[];
+    page: number;
+    size: number;
+    total_elements: number;
+    total_pages: number;
+    is_first: boolean;
+    is_last: boolean;
+  };
 }
 
 class TopicService {
@@ -79,7 +89,7 @@ class TopicService {
   /**
    * Delete topic
    */
-  async delete(id: number): Promise<{ message: string; status: number }> {
+  async delete(id: number): Promise<TopicResponse> {
     return apiClient.delete(`/topics/${id}`);
   }
 }

@@ -2,59 +2,38 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Users,
-  BookOpen,
-  Library,
-  TrendingUp,
-  DollarSign,
-  Activity,
-} from "lucide-react";
+import { BookOpen, Library, Languages, TrendingUp } from "lucide-react";
 
 interface Stats {
-  totalUsers: number;
   totalSyllabuses: number;
+  totalTopics: number;
+  totalCourses: number;
   totalVocabularies: number;
-  activeEnrollments: number;
-  totalRevenue: number;
-  growthRate: number;
 }
 
-export default function AdminDashboard() {
+export default function ManagerDashboard() {
   const [stats, setStats] = useState<Stats>({
-    totalUsers: 0,
     totalSyllabuses: 0,
+    totalTopics: 0,
+    totalCourses: 0,
     totalVocabularies: 0,
-    activeEnrollments: 0,
-    totalRevenue: 0,
-    growthRate: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // TODO: Fetch stats from API
-    // For now, using mock data
     setTimeout(() => {
       setStats({
-        totalUsers: 1234,
         totalSyllabuses: 45,
+        totalTopics: 234,
+        totalCourses: 567,
         totalVocabularies: 15678,
-        activeEnrollments: 892,
-        totalRevenue: 25000,
-        growthRate: 12.5,
       });
       setIsLoading(false);
     }, 500);
   }, []);
 
   const statsCards = [
-    {
-      name: "Total Users",
-      value: stats.totalUsers.toLocaleString(),
-      icon: Users,
-      color: "bg-blue-500",
-      change: "+12%",
-    },
     {
       name: "Syllabuses",
       value: stats.totalSyllabuses.toLocaleString(),
@@ -63,39 +42,32 @@ export default function AdminDashboard() {
       change: "+5%",
     },
     {
-      name: "Vocabularies",
-      value: stats.totalVocabularies.toLocaleString(),
-      icon: BookOpen,
-      color: "bg-green-500",
-      change: "+18%",
+      name: "Topics",
+      value: stats.totalTopics.toLocaleString(),
+      icon: TrendingUp,
+      color: "bg-blue-500",
+      change: "+12%",
     },
     {
-      name: "Active Enrollments",
-      value: stats.activeEnrollments.toLocaleString(),
-      icon: Activity,
-      color: "bg-yellow-500",
+      name: "Courses",
+      value: stats.totalCourses.toLocaleString(),
+      icon: BookOpen,
+      color: "bg-green-500",
       change: "+8%",
     },
     {
-      name: "Total Revenue",
-      value: `$${stats.totalRevenue.toLocaleString()}`,
-      icon: DollarSign,
-      color: "bg-emerald-500",
-      change: "+15%",
-    },
-    {
-      name: "Growth Rate",
-      value: `${stats.growthRate}%`,
-      icon: TrendingUp,
-      color: "bg-rose-500",
-      change: "+2.5%",
+      name: "Vocabularies",
+      value: stats.totalVocabularies.toLocaleString(),
+      icon: Languages,
+      color: "bg-amber-500",
+      change: "+18%",
     },
   ];
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-indigo-600"></div>
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-purple-600"></div>
       </div>
     );
   }
@@ -104,15 +76,15 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Dashboard
+          Content Manager Dashboard
         </h1>
         <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Welcome to the admin dashboard
+          Manage syllabuses, topics, courses, and vocabularies
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {statsCards.map((stat) => (
           <Card
             key={stat.name}
@@ -144,28 +116,28 @@ export default function AdminDashboard() {
       <Card className="border-0 shadow-lg">
         <CardContent className="p-6">
           <h2 className="mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            Recent Activity
+            Recent Updates
           </h2>
           <div className="space-y-4">
             {[
               {
-                action: "New user registered",
-                user: "john@example.com",
+                action: "Syllabus updated",
+                item: "English for Beginners",
                 time: "5 minutes ago",
               },
               {
-                action: "Syllabus created",
-                user: "admin@vocafy.com",
+                action: "New topic created",
+                item: "Daily Conversations",
                 time: "15 minutes ago",
               },
               {
-                action: "Payment received",
-                user: "user@example.com",
+                action: "Course updated",
+                item: "Business English",
                 time: "1 hour ago",
               },
               {
-                action: "New enrollment",
-                user: "student@example.com",
+                action: "Vocabulary added",
+                item: "50 new words to Basic Course",
                 time: "2 hours ago",
               },
             ].map((activity, index) => (
@@ -178,7 +150,7 @@ export default function AdminDashboard() {
                     {activity.action}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {activity.user}
+                    {activity.item}
                   </p>
                 </div>
                 <span className="text-sm text-gray-500 dark:text-gray-500">
