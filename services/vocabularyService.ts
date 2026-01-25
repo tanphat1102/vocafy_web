@@ -1,63 +1,107 @@
 import { apiClient } from "./apiClient";
 
 export interface VocabularyTerm {
-  id?: number;
-  language: string;
-  value: string;
+  id: number;
+  language_code: string;
+  script_type: string;
+  text_value: string;
+  extra_meta: unknown | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface VocabularyMeaning {
-  id?: number;
-  language: string;
-  meaning: string;
-  example?: string;
+  id: number;
+  language_code: string;
+  meaning_text: string;
+  example_sentence: string | null;
+  example_translation: string | null;
+  part_of_speech: string;
+  sense_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface VocabularyMedia {
-  id?: number;
-  type: string;
+  id: number;
+  media_type: string;
   url: string;
+  meta: unknown | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Vocabulary {
   id: number;
-  courseId: number;
+  course_id: number;
+  note: string | null;
+  sort_order: number;
+  is_active: boolean;
+  is_deleted: boolean;
   terms: VocabularyTerm[];
   meanings: VocabularyMeaning[];
   medias: VocabularyMedia[];
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VocabularyTermCreateRequest {
+  language_code: string;
+  script_type: string;
+  text_value: string;
+  extra_meta?: unknown;
+}
+
+export interface VocabularyMeaningCreateRequest {
+  language_code: string;
+  meaning_text: string;
+  example_sentence?: string;
+  example_translation?: string;
+  part_of_speech: string;
+  sense_order: number;
+}
+
+export interface VocabularyMediaCreateRequest {
+  media_type: string;
+  url: string;
+  meta?: unknown;
 }
 
 export interface VocabularyCreateRequest {
-  courseId: number;
-  terms: Omit<VocabularyTerm, "id">[];
-  meanings: Omit<VocabularyMeaning, "id">[];
-  medias?: Omit<VocabularyMedia, "id">[];
+  course_id: number;
+  note?: string;
+  sort_order: number;
+  terms: VocabularyTermCreateRequest[];
+  meanings: VocabularyMeaningCreateRequest[];
+  medias?: VocabularyMediaCreateRequest[];
 }
 
 export interface VocabularyUpdateRequest {
-  terms: VocabularyTerm[];
-  meanings: VocabularyMeaning[];
-  medias?: VocabularyMedia[];
+  note?: string;
+  sort_order?: number;
+  terms?: VocabularyTermCreateRequest[];
+  meanings?: VocabularyMeaningCreateRequest[];
+  medias?: VocabularyMediaCreateRequest[];
 }
 
 export interface VocabularyResponse {
-  data: Vocabulary;
+  success: boolean;
   message: string;
-  status: number;
+  result: Vocabulary;
 }
 
 export interface VocabularyListResponse {
-  data: {
-    content: Vocabulary[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    number: number;
-  };
+  success: boolean;
   message: string;
-  status: number;
+  result: {
+    content: Vocabulary[];
+    page: number;
+    size: number;
+    total_elements: number;
+    total_pages: number;
+    is_first: boolean;
+    is_last: boolean;
+  };
 }
 
 class VocabularyService {
@@ -98,7 +142,7 @@ class VocabularyService {
   /**
    * Delete vocabulary
    */
-  async delete(id: number): Promise<{ message: string; status: number }> {
+  async delete(id: number): Promise<VocabularyResponse> {
     return apiClient.delete(`/vocabularies/${id}`);
   }
 }
