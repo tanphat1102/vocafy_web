@@ -52,10 +52,10 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="hidden md:flex w-64 flex-col bg-white border-r">
-        <div className="p-6 border-b">
+      <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border">
+        <div className="p-6 border-b border-border">
           <Link href="/" className="flex items-center">
             <Image
               src="/images/logoFull.png"
@@ -74,10 +74,10 @@ export default function AdminLayout({
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive
-                    ? "bg-indigo-50 text-indigo-600"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-primary/10 text-primary shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                 }`}
               >
                 <item.icon className="w-5 h-5" />
@@ -87,7 +87,7 @@ export default function AdminLayout({
           })}
         </nav>
 
-        <div className="p-4 border-t">
+        <div className="p-4 border-t border-border">
           <Button
             variant="outline"
             className="w-full justify-start gap-3"
@@ -102,24 +102,26 @@ export default function AdminLayout({
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white border-b px-6 py-4">
+        <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="w-5 h-5" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-foreground">
                   Admin Panel
                 </h1>
-                <p className="text-sm text-gray-500">Welcome back, Admin</p>
+                <p className="text-sm text-muted-foreground">
+                  Welcome back, Admin
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-indigo-600 rounded-full"></span>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
               </Button>
 
               <DropdownMenu>
@@ -130,7 +132,7 @@ export default function AdminLayout({
                   >
                     <Avatar className="h-10 w-10">
                       <AvatarImage src="/avatars/admin.png" alt="Admin" />
-                      <AvatarFallback className="bg-indigo-600 text-white">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
                         AD
                       </AvatarFallback>
                     </Avatar>
@@ -152,7 +154,7 @@ export default function AdminLayout({
         </header>
 
         {/* Dashboard Content */}
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-6 bg-background">{children}</main>
       </div>
     </div>
   );

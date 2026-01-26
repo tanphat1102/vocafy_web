@@ -48,10 +48,10 @@ export default function ManagerLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       {/* Sidebar */}
-      <aside className="hidden md:flex w-64 flex-col bg-white border-r">
-        <div className="p-6 border-b">
+      <aside className="hidden md:flex w-64 flex-col bg-card border-r border-border">
+        <div className="p-6 border-b border-border">
           <Link href="/" className="flex items-center">
             <Image
               src="/images/logoFull.png"
@@ -70,10 +70,10 @@ export default function ManagerLayout({
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-colors ${
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
                   isActive
-                    ? "bg-purple-50 text-purple-600"
-                    : "text-gray-700 hover:bg-gray-100"
+                    ? "bg-accent/20 text-accent-foreground shadow-sm"
+                    : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                 }`}
               >
                 <item.icon className="w-5 h-5" />
@@ -83,7 +83,7 @@ export default function ManagerLayout({
           })}
         </nav>
 
-        <div className="p-4 border-t">
+        <div className="p-4 border-t border-border">
           <Button
             variant="outline"
             className="w-full justify-start gap-3"
@@ -98,24 +98,26 @@ export default function ManagerLayout({
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <header className="bg-white border-b px-6 py-4">
+        <header className="bg-card border-b border-border px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="w-5 h-5" />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-2xl font-bold text-foreground">
                   Manager Panel
                 </h1>
-                <p className="text-sm text-gray-500">Welcome back, Manager</p>
+                <p className="text-sm text-muted-foreground">
+                  Welcome back, Manager
+                </p>
               </div>
             </div>
 
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-5 h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-purple-600 rounded-full"></span>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full"></span>
               </Button>
 
               <DropdownMenu>
@@ -126,7 +128,7 @@ export default function ManagerLayout({
                   >
                     <Avatar className="h-10 w-10">
                       <AvatarImage src="/avatars/manager.png" alt="Manager" />
-                      <AvatarFallback className="bg-purple-600 text-white">
+                      <AvatarFallback className="bg-accent text-accent-foreground">
                         MG
                       </AvatarFallback>
                     </Avatar>
@@ -148,7 +150,7 @@ export default function ManagerLayout({
         </header>
 
         {/* Dashboard Content */}
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-6 bg-background">{children}</main>
       </div>
     </div>
   );

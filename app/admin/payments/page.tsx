@@ -102,10 +102,10 @@ export default function AdminPaymentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-bold text-foreground">
             Payment Management
           </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-muted-foreground">
             Manage subscription packages and payments
           </p>
         </div>
@@ -113,58 +113,62 @@ export default function AdminPaymentsPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="border-0 shadow-lg">
+        <Card className="border-0 shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-muted-foreground">
                   Premium Packages
                 </p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+                <p className="mt-2 text-3xl font-bold text-foreground">
                   {packages.length}
                 </p>
-                <p className="mt-2 text-sm text-gray-600">Total packages</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Total packages
+                </p>
               </div>
-              <div className="rounded-full bg-purple-500 p-3">
-                <CreditCard className="h-8 w-8 text-white" />
+              <div className="rounded-full bg-chart-1/10 p-3">
+                <CreditCard className="h-8 w-8 text-chart-1" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg">
+        <Card className="border-0 shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-muted-foreground">
                   Payment Methods
                 </p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
+                <p className="mt-2 text-3xl font-bold text-foreground">
                   {paymentMethods.length}
                 </p>
-                <p className="mt-2 text-sm text-gray-600">Available methods</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Available methods
+                </p>
               </div>
-              <div className="rounded-full bg-indigo-500 p-3">
-                <DollarSign className="h-8 w-8 text-white" />
+              <div className="rounded-full bg-chart-2/10 p-3">
+                <DollarSign className="h-8 w-8 text-chart-2" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-lg">
+        <Card className="border-0 shadow-sm bg-card">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-muted-foreground">
                   Active Subscriptions
                 </p>
-                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">
-                  892
+                <p className="mt-2 text-3xl font-bold text-foreground">892</p>
+                <p className="mt-2 text-sm text-primary/80 font-medium">
+                  +12% this month
                 </p>
-                <p className="mt-2 text-sm text-green-600">+12% this month</p>
               </div>
-              <div className="rounded-full bg-green-500 p-3">
-                <CreditCard className="h-8 w-8 text-white" />
+              <div className="rounded-full bg-chart-3/10 p-3">
+                <CreditCard className="h-8 w-8 text-chart-3" />
               </div>
             </div>
           </CardContent>

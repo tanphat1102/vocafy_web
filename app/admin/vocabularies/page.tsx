@@ -173,7 +173,7 @@ export default function AdminVocabulariesPage() {
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-indigo-600"></div>
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
   }
@@ -182,17 +182,12 @@ export default function AdminVocabulariesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Vocabularies
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <h1 className="text-3xl font-bold text-foreground">Vocabularies</h1>
+          <p className="mt-2 text-muted-foreground">
             Manage all vocabularies in the system
           </p>
         </div>
-        <Button
-          className="bg-indigo-600 hover:bg-indigo-700"
-          onClick={openCreateDialog}
-        >
+        <Button onClick={openCreateDialog}>
           <Plus className="mr-2 h-4 w-4" />
           Create Vocabulary
         </Button>
@@ -319,7 +314,7 @@ export default function AdminVocabulariesPage() {
         open={dialogMode === "create" || dialogMode === "edit"}
         onOpenChange={closeDialog}
       >
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-primary/30 shadow-lg shadow-primary/10">
           <DialogHeader>
             <DialogTitle>
               {dialogMode === "create" ? "Create" : "Edit"} Vocabulary
@@ -488,7 +483,7 @@ export default function AdminVocabulariesPage() {
 
       {/* View Details Dialog */}
       <Dialog open={dialogMode === "view"} onOpenChange={closeDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-primary/30 shadow-lg shadow-primary/10">
           <DialogHeader>
             <DialogTitle>Vocabulary Details</DialogTitle>
             <DialogDescription>

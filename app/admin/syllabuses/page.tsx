@@ -140,7 +140,7 @@ export default function AdminSyllabusesPage() {
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-indigo-600"></div>
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
   }
@@ -149,28 +149,23 @@ export default function AdminSyllabusesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Syllabuses
-          </h1>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
+          <h1 className="text-3xl font-bold text-foreground">Syllabuses</h1>
+          <p className="mt-2 text-muted-foreground">
             Manage all syllabuses in the system
           </p>
         </div>
-        <Button
-          className="bg-indigo-600 hover:bg-indigo-700"
-          onClick={openCreateDialog}
-        >
+        <Button onClick={openCreateDialog}>
           <Plus className="mr-2 h-4 w-4" />
           Create Syllabus
         </Button>
       </div>
 
       {/* Search */}
-      <Card className="border-0 shadow-lg">
+      <Card className="border-0 shadow-sm bg-card">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search syllabuses..."
                 value={searchTerm}
@@ -183,7 +178,7 @@ export default function AdminSyllabusesPage() {
       </Card>
 
       {/* Table */}
-      <Card className="border-0 shadow-lg">
+      <Card className="border-0 shadow-sm bg-card">
         <CardContent className="p-0">
           <Table>
             <TableHeader>
@@ -311,7 +306,7 @@ export default function AdminSyllabusesPage() {
         open={dialogMode === "create" || dialogMode === "edit"}
         onOpenChange={closeDialog}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl border-2 border-primary/30 shadow-lg shadow-primary/10">
           <DialogHeader>
             <DialogTitle>
               {dialogMode === "create" ? "Create" : "Edit"} Syllabus
@@ -435,7 +430,7 @@ export default function AdminSyllabusesPage() {
 
       {/* View Details Dialog */}
       <Dialog open={dialogMode === "view"} onOpenChange={closeDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl border-2 border-primary/30 shadow-lg shadow-primary/10">
           <DialogHeader>
             <DialogTitle>Syllabus Details</DialogTitle>
             <DialogDescription>
