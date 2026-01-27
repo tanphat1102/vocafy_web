@@ -5,7 +5,6 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { FadeInOnScroll } from "@/components/ui/fade-in-on-scroll";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   BookOpen,
   Target,
@@ -19,10 +18,6 @@ import {
   X,
   Minus,
   Maximize2,
-  Globe,
-  Users,
-  Award,
-  TrendingUp,
 } from "lucide-react";
 
 // Prism/Rainbow colors for books
@@ -285,7 +280,7 @@ function VerticalBook({
           transition-all duration-300
           ${
             isSelected
-              ? `bg-gradient-to-r ${book.prism.gradient} shadow-lg`
+              ? `bg-linear-to-r ${book.prism.gradient} shadow-lg`
               : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750"
           }
         `}
@@ -294,7 +289,7 @@ function VerticalBook({
           {/* Icon */}
           <div
             className={`
-            w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0
+            w-9 h-9 rounded-lg flex items-center justify-center shrink-0
             transition-all duration-300
             ${
               isSelected
@@ -338,7 +333,7 @@ function VerticalBook({
 
           {/* Selection indicator */}
           {isSelected && (
-            <ChevronRight className="w-4 h-4 text-white flex-shrink-0 animate-pulse" />
+            <ChevronRight className="w-4 h-4 text-white shrink-0 animate-pulse" />
           )}
         </div>
       </div>
@@ -363,14 +358,14 @@ function MacWindowCard({
       <div className="relative">
         {/* Window shadow */}
         <div
-          className={`absolute -inset-4 bg-gradient-to-br ${book.prism.gradient} opacity-20 rounded-3xl blur-2xl`}
+          className={`absolute -inset-4 bg-linear-to-br ${book.prism.gradient} opacity-20 rounded-3xl blur-2xl`}
         />
 
         {/* Main Window */}
         <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
           {/* Window Title Bar (macOS style) */}
           <div
-            className={`bg-gradient-to-r ${book.prism.gradient} px-4 py-3 flex items-center gap-3`}
+            className={`bg-linear-to-r ${book.prism.gradient} px-4 py-3 flex items-center gap-3`}
           >
             {/* Traffic lights */}
             <div className="flex items-center gap-2">
@@ -399,7 +394,7 @@ function MacWindowCard({
             </div>
 
             {/* Spacer for centering */}
-            <div className="w-[52px]" />
+            <div className="w-13" />
           </div>
 
           {/* Content Area - Timeline Layout */}
@@ -407,7 +402,7 @@ function MacWindowCard({
             <div className="relative">
               {/* Timeline line */}
               <div
-                className={`absolute left-[7px] md:left-[9px] top-2 bottom-2 w-0.5 ${book.prism.bg} opacity-30`}
+                className={`absolute left-1.75 md:left-2.25 top-2 bottom-2 w-0.5 ${book.prism.bg} opacity-30`}
               />
 
               <div className="space-y-6">
@@ -418,7 +413,7 @@ function MacWindowCard({
                     style={{ animationDelay: `${i * 80 + 150}ms` }}
                   >
                     {/* Timeline dot */}
-                    <div className="flex-shrink-0 relative z-10">
+                    <div className="shrink-0 relative z-10">
                       <div
                         className={`w-4 h-4 md:w-5 md:h-5 rounded-full ${book.prism.bg} shadow-lg flex items-center justify-center`}
                       >
@@ -500,7 +495,7 @@ export default function IntroductionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden transition-colors duration-500">
+    <div>
       <Navbar />
 
       {/* Hero Section */}
@@ -515,7 +510,7 @@ export default function IntroductionPage() {
           </Badge>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white mb-4">
             Thư Viện{" "}
-            <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               Kiến Thức
             </span>{" "}
             Vocafy

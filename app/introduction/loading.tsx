@@ -3,7 +3,7 @@ import { Footer } from "@/components/layout/footer";
 
 export default function IntroductionLoading() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div className="min-h-screen bg-linear-to-b from-blue-50 to-white">
       <Navbar />
 
       {/* Hero Skeleton */}
