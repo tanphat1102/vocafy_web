@@ -9,10 +9,7 @@ import { cn } from "@/lib/utils";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
 import { authService } from "@/services/authService";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import {
-  onAuthStateChanged,
-  type User,
-} from "firebase/auth";
+import { onAuthStateChanged, type User } from "firebase/auth";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -20,6 +17,7 @@ const navLinks = [
   { href: "/syllabus", label: "Syllabus" },
   { href: "/extension", label: "Extension" },
   { href: "/ai-tutor", label: "AI Tutor" },
+  { href: "/plans", label: "Plans" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -60,7 +58,7 @@ export function Navbar() {
   };
 
   return (
-    <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 transition-colors duration-300">
+    <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50 transition-colors duration-300">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center group">
           <Image
@@ -83,16 +81,16 @@ export function Navbar() {
                 className={cn(
                   "text-sm font-medium transition-all duration-300 relative group",
                   isActive
-                    ? "text-indigo-600 dark:text-indigo-400"
-                    : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+                    ? "text-primary dark:text-primary"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {link.label}
-                <span 
+                <span
                   className={cn(
-                    "absolute -bottom-1 left-0 h-0.5 bg-indigo-600 dark:bg-indigo-400 transition-all duration-300",
-                    isActive ? "w-full" : "w-0 group-hover:w-full"
-                  )} 
+                    "absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300",
+                    isActive ? "w-full" : "w-0 group-hover:w-full",
+                  )}
                 />
               </Link>
             );
@@ -101,10 +99,10 @@ export function Navbar() {
 
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          
+
           {user ? (
             <div className="flex items-center gap-3">
-              <span className="hidden sm:inline text-sm text-gray-700 dark:text-gray-300">
+              <span className="hidden sm:inline text-sm text-foreground/70">
                 {user.displayName ?? user.email ?? "Signed in"}
               </span>
               <Button
@@ -112,7 +110,7 @@ export function Navbar() {
                 variant="outline"
                 onClick={handleLogout}
                 disabled={isAuthLoading}
-                className="rounded-full dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                className="rounded-full"
               >
                 Logout
               </Button>
@@ -123,9 +121,13 @@ export function Navbar() {
               variant="outline"
               onClick={handleGoogleLogin}
               disabled={isAuthLoading}
-              className="rounded-full border-gray-200 bg-white text-gray-800 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="rounded-full"
             >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
+              <svg
+                className="w-5 h-5 mr-2"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
