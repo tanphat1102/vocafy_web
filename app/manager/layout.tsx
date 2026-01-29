@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { authService, userService, type User as UserType } from "@/services";
 import { usePathname } from "next/navigation";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const navigation = [
   { name: "Dashboard", href: "/manager", icon: Home },
@@ -132,6 +133,7 @@ export default function ManagerLayout({
             </div>
 
             <div className="flex items-center gap-4">
+              <ThemeToggle />
               <Button variant="ghost" size="icon" className="relative">
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full"></span>
@@ -173,8 +175,28 @@ export default function ManagerLayout({
                   <DropdownMenuItem asChild>
                     <Link href="/profile">Profile</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                    Manager Features
+                  </div>
                   <DropdownMenuItem asChild>
-                    <Link href="/manager/settings">Settings</Link>
+                    <Link href="/manager/syllabuses">Syllabuses</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/manager/vocabularies">Vocabularies</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/manager/courses">Courses</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/manager/topics">Topics</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                    Switch Role
+                  </div>
+                  <DropdownMenuItem asChild>
+                    <Link href="/">User</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>

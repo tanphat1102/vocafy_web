@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { onAuthStateChanged, type User } from "firebase/auth";
-import { User as UserIcon, LogOut, Settings } from "lucide-react";
+import { User as UserIcon, LogOut, Shield } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -140,7 +140,7 @@ export function Navbar() {
                       src={appUser?.profile?.avatar_url || ""}
                       alt={appUser?.profile?.display_name || user.email || ""}
                     />
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                    <AvatarFallback className="bg-linear-to-br from-primary to-accent text-primary-foreground">
                       {(
                         appUser?.profile?.display_name ||
                         user.displayName ||
@@ -173,16 +173,136 @@ export function Navbar() {
                   <UserIcon className="h-4 w-4" />
                   <span>My Profile</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    router.push("/settings");
-                    setDropdownOpen(false);
-                  }}
-                  className="cursor-pointer gap-2"
-                >
-                  <Settings className="h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
+
+                {/* Role-based Menu Items */}
+                {appUser?.role === "ADMIN" && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                      Admin Panel
+                    </div>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/admin");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Users
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/admin/payments");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Premium Packages
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/admin/payments");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Subscription Transactions
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/admin/payments");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Payment Methods
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                      Switch Role
+                    </div>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/manager");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Manager
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <UserIcon className="h-4 w-4 mr-2" />
+                      User
+                    </DropdownMenuItem>
+                  </>
+                )}
+
+                {appUser?.role === "MANAGER" && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                      Manager Panel
+                    </div>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/manager/syllabuses");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Syllabuses
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/manager/vocabularies");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Vocabularies
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/manager/courses");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Courses
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/manager/topics");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      Topics
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
+                      Switch Role
+                    </div>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        router.push("/");
+                        setDropdownOpen(false);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <UserIcon className="h-4 w-4 mr-2" />
+                      User
+                    </DropdownMenuItem>
+                  </>
+                )}
+
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
