@@ -47,8 +47,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md shadow-lg border-2 border-border">
         <CardContent className="pt-8 pb-6 px-8">
           {/* Logo */}
           <div className="flex justify-center mb-8">
@@ -63,18 +63,18 @@ export default function LoginPage() {
 
           {/* Heading */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Welcome back!
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Enter your credentials to access your account
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+              <p className="text-sm text-destructive">{error}</p>
             </div>
           )}
 
@@ -82,11 +82,11 @@ export default function LoginPage() {
           <form className="space-y-5">
             {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700 font-medium">
+              <Label htmlFor="email" className="text-foreground font-medium">
                 Email
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
@@ -98,11 +98,11 @@ export default function LoginPage() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700 font-medium">
+              <Label htmlFor="password" className="text-foreground font-medium">
                 Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -112,7 +112,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -127,7 +127,7 @@ export default function LoginPage() {
             <div className="flex justify-end">
               <Link
                 href="/forgot-password"
-                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                className="text-sm text-primary hover:text-primary/80 font-medium"
               >
                 Forgot password?
               </Link>
@@ -136,7 +136,7 @@ export default function LoginPage() {
             {/* Sign In Button */}
             <Button
               type="submit"
-              className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-base"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-base"
             >
               Sign In
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -146,10 +146,10 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-medium">
+              <span className="px-4 bg-background text-muted-foreground font-medium">
                 OR CONTINUE WITH
               </span>
             </div>
@@ -160,13 +160,13 @@ export default function LoginPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full h-12 font-medium text-gray-700 border-gray-300 hover:bg-gray-50"
+              className="w-full h-12 font-medium text-foreground border-border hover:bg-muted"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
-                  <div className="w-5 h-5 mr-3 animate-spin rounded-full border-2 border-gray-300 border-t-indigo-600" />
+                  <div className="w-5 h-5 mr-3 animate-spin rounded-full border-2 border-muted-foreground border-t-primary" />
                   Signing in...
                 </>
               ) : (
@@ -221,11 +221,11 @@ export default function LoginPage() {
 
           {/* Sign Up Link */}
           <div className="text-center mt-6">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link
                 href="/register"
-                className="text-indigo-600 hover:text-indigo-700 font-medium"
+                className="text-primary hover:text-primary/80 font-medium"
               >
                 Sign up
               </Link>

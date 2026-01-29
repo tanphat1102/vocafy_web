@@ -31,11 +31,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 
 interface Stats {
   totalUsers: number;

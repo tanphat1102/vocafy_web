@@ -3,22 +3,21 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { FadeInOnScroll } from "@/components/ui/fade-in-on-scroll";
 import { MouseFollowImage } from "@/components/ui/mouse-follow-image";
-import { FloatingElements, ParticleField } from "@/components/ui/floating-elements";
+import {
+  FloatingElements,
+  ParticleField,
+} from "@/components/ui/floating-elements";
 import { CountingNumber } from "@/components/ui/counting-number";
 import {
   Sparkles,
   Languages,
   RefreshCcw,
-  Globe,
-  Star,
   ArrowRight,
   Smartphone,
-  QrCode,
   Download,
   CheckCircle2,
   BookOpen,
@@ -29,10 +28,10 @@ import {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 relative overflow-hidden transition-colors duration-500">
+    <div>
       {/* Floating background elements */}
       <FloatingElements className="opacity-30 dark:opacity-20" count={6} />
-      
+
       <Navbar />
 
       {/* Hero Section - Centered Layout */}
@@ -50,12 +49,19 @@ export default function Home() {
             A powerful vocabulary learning tool{" "}
             <br className="hidden md:block" />
             that&apos;s{" "}
-            <span className="text-indigo-600 dark:text-indigo-400">intuitive</span> and{" "}
-            <span className="text-emerald-500 dark:text-emerald-400">simple</span> to use.
+            <span className="text-indigo-600 dark:text-indigo-400">
+              intuitive
+            </span>{" "}
+            and{" "}
+            <span className="text-emerald-500 dark:text-emerald-400">
+              simple
+            </span>{" "}
+            to use.
           </h1>
 
           <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl mx-auto">
-            With stellar AI-powered learning and unmatched support, see how Vocafy will make a difference in your language journey.
+            With stellar AI-powered learning and unmatched support, see how
+            Vocafy will make a difference in your language journey.
           </p>
 
           <div className="pt-4">
@@ -74,43 +80,47 @@ export default function Home() {
           <div className="relative flex justify-center items-end gap-2 md:gap-4 py-8 overflow-hidden">
             {/* Circle frames for images */}
             <MouseFollowImage intensity={8} className="hidden sm:block">
-              <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl bg-gradient-to-br from-indigo-200 to-blue-200 dark:from-indigo-900 dark:to-blue-900 -rotate-6 hover:rotate-0 transition-all duration-500 hover:scale-105">
+              <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl bg-linear-to-br from-indigo-200 to-blue-200 dark:from-indigo-900 dark:to-blue-900 -rotate-6 hover:rotate-0 transition-all duration-500 hover:scale-105">
                 <div className="w-full h-full flex items-center justify-center bg-indigo-100 dark:bg-indigo-800">
                   <BookOpen className="w-12 h-12 md:w-16 md:h-16 text-indigo-600 dark:text-indigo-300" />
                 </div>
               </div>
             </MouseFollowImage>
-            
+
             <MouseFollowImage intensity={10}>
-              <div className="w-36 h-36 md:w-52 md:h-52 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-2xl bg-gradient-to-br from-purple-200 to-pink-200 dark:from-purple-900 dark:to-pink-900 hover:scale-105 transition-all duration-500">
+              <div className="w-36 h-36 md:w-52 md:h-52 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-2xl bg-linear-to-br from-purple-200 to-pink-200 dark:from-purple-900 dark:to-pink-900 hover:scale-105 transition-all duration-500">
                 <div className="w-full h-full flex items-center justify-center bg-purple-100 dark:bg-purple-800">
                   <Brain className="w-16 h-16 md:w-24 md:h-24 text-purple-600 dark:text-purple-300" />
                 </div>
               </div>
             </MouseFollowImage>
-            
+
             <MouseFollowImage intensity={12}>
-              <div className="w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-2xl bg-gradient-to-br from-emerald-200 to-teal-200 dark:from-emerald-900 dark:to-teal-900 hover:scale-105 transition-all duration-500 relative">
+              <div className="w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-2xl bg-linear-to-br from-emerald-200 to-teal-200 dark:from-emerald-900 dark:to-teal-900 hover:scale-105 transition-all duration-500 relative">
                 <div className="w-full h-full flex items-center justify-center bg-emerald-100 dark:bg-emerald-800 relative">
                   <div className="text-center">
-                    <div className="text-5xl md:text-7xl font-bold text-emerald-600 dark:text-emerald-300">V</div>
-                    <div className="text-sm md:text-base font-medium text-emerald-700 dark:text-emerald-400">Vocafy</div>
+                    <div className="text-5xl md:text-7xl font-bold text-emerald-600 dark:text-emerald-300">
+                      V
+                    </div>
+                    <div className="text-sm md:text-base font-medium text-emerald-700 dark:text-emerald-400">
+                      Vocafy
+                    </div>
                   </div>
                   <ParticleField particleCount={8} />
                 </div>
               </div>
             </MouseFollowImage>
-            
+
             <MouseFollowImage intensity={10}>
-              <div className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl bg-gradient-to-br from-amber-200 to-orange-200 dark:from-amber-900 dark:to-orange-900 rotate-3 hover:rotate-0 transition-all duration-500 hover:scale-105">
+              <div className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl bg-linear-to-br from-amber-200 to-orange-200 dark:from-amber-900 dark:to-orange-900 rotate-3 hover:rotate-0 transition-all duration-500 hover:scale-105">
                 <div className="w-full h-full flex items-center justify-center bg-amber-100 dark:bg-amber-800">
                   <Target className="w-14 h-14 md:w-20 md:h-20 text-amber-600 dark:text-amber-300" />
                 </div>
               </div>
             </MouseFollowImage>
-            
+
             <MouseFollowImage intensity={8} className="hidden sm:block">
-              <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl bg-gradient-to-br from-rose-200 to-red-200 dark:from-rose-900 dark:to-red-900 -rotate-3 hover:rotate-0 transition-all duration-500 hover:scale-105">
+              <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl bg-linear-to-br from-rose-200 to-red-200 dark:from-rose-900 dark:to-red-900 -rotate-3 hover:rotate-0 transition-all duration-500 hover:scale-105">
                 <div className="w-full h-full flex items-center justify-center bg-rose-100 dark:bg-rose-800">
                   <Zap className="w-12 h-12 md:w-16 md:h-16 text-rose-600 dark:text-rose-300" />
                 </div>
@@ -131,38 +141,47 @@ export default function Home() {
               </Badge>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white">
                 Learn Smarter with{" "}
-                <span className="text-indigo-600 dark:text-indigo-400">Artificial Intelligence</span>
+                <span className="text-indigo-600 dark:text-indigo-400">
+                  Artificial Intelligence
+                </span>
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                Our AI adapts to your learning style, identifies your weak points, and creates personalized study paths. 
-                Experience learning that evolves with you.
+                Our AI adapts to your learning style, identifies your weak
+                points, and creates personalized study paths. Experience
+                learning that evolves with you.
               </p>
               <div className="flex items-center gap-8 pt-4">
                 <div className="text-center">
                   <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
                     <CountingNumber value={95} suffix="%" />
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Accuracy</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Accuracy
+                  </p>
                 </div>
                 <div className="text-center">
                   <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
                     <CountingNumber value={3} suffix="x" />
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Faster Learning</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Faster Learning
+                  </p>
                 </div>
                 <div className="text-center">
                   <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                     <CountingNumber value={10} suffix="K+" />
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Users</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Users
+                  </p>
                 </div>
               </div>
             </FadeInOnScroll>
-            
+
             <FadeInOnScroll delay={200}>
               <MouseFollowImage intensity={12} glowEffect>
-                <div className="aspect-square max-w-md mx-auto bg-gradient-to-br from-indigo-400 via-purple-400 to-pink-400 rounded-3xl shadow-2xl overflow-hidden relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 animate-gradient-x" />
+                <div className="aspect-square max-w-md mx-auto bg-linear-to-br from-indigo-400 via-purple-400 to-pink-400 rounded-3xl shadow-2xl overflow-hidden relative group">
+                  <div className="absolute inset-0 bg-linear-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 animate-gradient-x" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-white text-center group-hover:scale-110 transition-transform duration-500">
                       <Brain className="w-24 h-24 mx-auto mb-4" />
@@ -183,8 +202,8 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <FadeInOnScroll delay={200} className="md:order-1">
               <MouseFollowImage intensity={12} glowEffect>
-                <div className="aspect-square max-w-md mx-auto bg-gradient-to-br from-blue-400 via-cyan-400 to-teal-400 rounded-3xl shadow-2xl overflow-hidden relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-teal-500/20 animate-gradient-x" />
+                <div className="aspect-square max-w-md mx-auto bg-linear-to-br from-blue-400 via-cyan-400 to-teal-400 rounded-3xl shadow-2xl overflow-hidden relative group">
+                  <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 via-cyan-500/20 to-teal-500/20 animate-gradient-x" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-white text-center group-hover:scale-110 transition-transform duration-500">
                       <Languages className="w-24 h-24 mx-auto mb-4" />
@@ -195,7 +214,7 @@ export default function Home() {
                 </div>
               </MouseFollowImage>
             </FadeInOnScroll>
-            
+
             <FadeInOnScroll className="space-y-6 md:order-2">
               <Badge className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
                 <Languages className="w-4 h-4 mr-2" />
@@ -203,16 +222,34 @@ export default function Home() {
               </Badge>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white">
                 Master{" "}
-                <span className="text-blue-600 dark:text-blue-400">Japanese</span> &{" "}
-                <span className="text-cyan-600 dark:text-cyan-400">English</span>
+                <span className="text-blue-600 dark:text-blue-400">
+                  Japanese
+                </span>{" "}
+                &{" "}
+                <span className="text-cyan-600 dark:text-cyan-400">
+                  English
+                </span>
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                Whether you&apos;re preparing for JLPT or advancing your professional English, 
-                our comprehensive vocabulary system covers all levels from beginner to advanced.
+                Whether you&apos;re preparing for JLPT or advancing your
+                professional English, our comprehensive vocabulary system covers
+                all levels from beginner to advanced.
               </p>
               <div className="flex flex-wrap gap-3">
-                {["JLPT N5", "JLPT N4", "JLPT N3", "JLPT N2", "JLPT N1", "TOEIC", "IELTS"].map((level) => (
-                  <Badge key={level} variant="outline" className="dark:border-gray-600 dark:text-gray-300">
+                {[
+                  "JLPT N5",
+                  "JLPT N4",
+                  "JLPT N3",
+                  "JLPT N2",
+                  "JLPT N1",
+                  "TOEIC",
+                  "IELTS",
+                ].map((level) => (
+                  <Badge
+                    key={level}
+                    variant="outline"
+                    className="dark:border-gray-600 dark:text-gray-300"
+                  >
                     {level}
                   </Badge>
                 ))}
@@ -233,31 +270,36 @@ export default function Home() {
               </Badge>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white">
                 Never Forget with{" "}
-                <span className="text-emerald-600 dark:text-emerald-400">Spaced Repetition</span>
+                <span className="text-emerald-600 dark:text-emerald-400">
+                  Spaced Repetition
+                </span>
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                Our scientifically-proven spaced repetition algorithm ensures you review words 
-                at the optimal time for maximum retention. Say goodbye to cramming!
+                Our scientifically-proven spaced repetition algorithm ensures
+                you review words at the optimal time for maximum retention. Say
+                goodbye to cramming!
               </p>
               <div className="space-y-3">
                 {[
                   "Review at optimal intervals",
                   "Track your memory strength",
                   "Adaptive difficulty adjustment",
-                  "Progress analytics dashboard"
+                  "Progress analytics dashboard",
                 ].map((feature, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-gray-700 dark:text-gray-300">{feature}</span>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {feature}
+                    </span>
                   </div>
                 ))}
               </div>
             </FadeInOnScroll>
-            
+
             <FadeInOnScroll delay={200}>
               <MouseFollowImage intensity={12} glowEffect>
-                <div className="aspect-square max-w-md mx-auto bg-gradient-to-br from-emerald-400 via-teal-400 to-green-400 rounded-3xl shadow-2xl overflow-hidden relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-green-500/20 animate-gradient-x" />
+                <div className="aspect-square max-w-md mx-auto bg-linear-to-br from-emerald-400 via-teal-400 to-green-400 rounded-3xl shadow-2xl overflow-hidden relative group">
+                  <div className="absolute inset-0 bg-linear-to-r from-emerald-500/20 via-teal-500/20 to-green-500/20 animate-gradient-x" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-white text-center group-hover:scale-110 transition-transform duration-500">
                       <RefreshCcw className="w-24 h-24 mx-auto mb-4" />
@@ -278,8 +320,8 @@ export default function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <FadeInOnScroll delay={200} className="md:order-1">
               <MouseFollowImage intensity={12} glowEffect>
-                <div className="aspect-square max-w-md mx-auto bg-gradient-to-br from-purple-400 via-pink-400 to-rose-400 rounded-3xl shadow-2xl overflow-hidden relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-rose-500/20 animate-gradient-x" />
+                <div className="aspect-square max-w-md mx-auto bg-linear-to-br from-purple-400 via-pink-400 to-rose-400 rounded-3xl shadow-2xl overflow-hidden relative group">
+                  <div className="absolute inset-0 bg-linear-to-r from-purple-500/20 via-pink-500/20 to-rose-500/20 animate-gradient-x" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-white text-center group-hover:scale-110 transition-transform duration-500">
                       <Smartphone className="w-24 h-24 mx-auto mb-4" />
@@ -290,7 +332,7 @@ export default function Home() {
                 </div>
               </MouseFollowImage>
             </FadeInOnScroll>
-            
+
             <FadeInOnScroll className="space-y-6 md:order-2">
               <Badge className="bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-300">
                 <Smartphone className="w-4 h-4 mr-2" />
@@ -298,24 +340,30 @@ export default function Home() {
               </Badge>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white">
                 Learn Anywhere with{" "}
-                <span className="text-purple-600 dark:text-purple-400">Our Mobile App</span>
+                <span className="text-purple-600 dark:text-purple-400">
+                  Our Mobile App
+                </span>
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                Download our app and learn on the go. Sync your progress across all devices 
-                and study even when you&apos;re offline.
+                Download our app and learn on the go. Sync your progress across
+                all devices and study even when you&apos;re offline.
               </p>
               <div className="flex items-center gap-8 pt-4">
                 <div className="text-center">
                   <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                     <CountingNumber value={10} suffix="K+" />
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Downloads</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Downloads
+                  </p>
                 </div>
                 <div className="text-center">
                   <p className="text-3xl font-bold text-pink-600 dark:text-pink-400">
                     <CountingNumber value={4.8} decimals={1} />
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Rating</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Rating
+                  </p>
                 </div>
               </div>
               <div className="flex flex-wrap gap-4 pt-4">
@@ -334,7 +382,7 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-linear-to-br from-indigo-600 via-indigo-700 to-purple-700 relative overflow-hidden">
         <div className="absolute inset-0">
           <ParticleField particleCount={30} />
         </div>
@@ -344,10 +392,11 @@ export default function Home() {
               Trusted by Thousands of Learners
             </h2>
             <p className="text-lg text-indigo-100 max-w-2xl mx-auto">
-              Join our growing community and start your language learning journey today.
+              Join our growing community and start your language learning
+              journey today.
             </p>
           </FadeInOnScroll>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
               { value: 10000, suffix: "+", label: "Active Users" },
@@ -358,9 +407,9 @@ export default function Home() {
               <FadeInOnScroll key={i} delay={i * 100}>
                 <div className="text-center">
                   <p className="text-4xl md:text-5xl font-bold text-white mb-2">
-                    <CountingNumber 
-                      value={stat.value} 
-                      suffix={stat.suffix} 
+                    <CountingNumber
+                      value={stat.value}
+                      suffix={stat.suffix}
                       decimals={stat.decimals}
                     />
                   </p>
@@ -378,18 +427,29 @@ export default function Home() {
           <FadeInOnScroll className="text-center max-w-3xl mx-auto space-y-6">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold dark:text-white">
               Ready to Start Your{" "}
-              <span className="text-indigo-600 dark:text-indigo-400">Learning Journey</span>?
+              <span className="text-indigo-600 dark:text-indigo-400">
+                Learning Journey
+              </span>
+              ?
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              Join thousands of learners who have already transformed their vocabulary skills with Vocafy.
+              Join thousands of learners who have already transformed their
+              vocabulary skills with Vocafy.
             </p>
             <div className="flex flex-wrap justify-center gap-4 pt-4">
-              <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-14 px-8 text-lg rounded-full group">
+              <Button
+                size="lg"
+                className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-14 px-8 text-lg rounded-full group"
+              >
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Link href="/introduction">
-                <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-full dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-14 px-8 text-lg rounded-full dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                >
                   Learn More
                 </Button>
               </Link>

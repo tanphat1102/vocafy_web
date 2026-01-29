@@ -14,8 +14,8 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md shadow-lg border-2 border-border">
         <CardContent className="pt-8 pb-6 px-8">
           {/* Logo */}
           <div className="flex justify-center mb-8">
@@ -30,10 +30,10 @@ export default function RegisterPage() {
 
           {/* Heading */}
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Create your account
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Join thousands of learners mastering vocabulary with AI
             </p>
           </div>
@@ -42,11 +42,11 @@ export default function RegisterPage() {
           <form className="space-y-5">
             {/* Full Name Field */}
             <div className="space-y-2">
-              <Label htmlFor="fullname" className="text-gray-700 font-medium">
+              <Label htmlFor="fullname" className="text-foreground font-medium">
                 Full Name
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="fullname"
                   type="text"
@@ -58,11 +58,11 @@ export default function RegisterPage() {
 
             {/* Email Field */}
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-gray-700 font-medium">
+              <Label htmlFor="email" className="text-foreground font-medium">
                 Email
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="email"
                   type="email"
@@ -74,11 +74,11 @@ export default function RegisterPage() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700 font-medium">
+              <Label htmlFor="password" className="text-foreground font-medium">
                 Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -88,7 +88,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -103,12 +103,12 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <Label
                 htmlFor="confirmPassword"
-                className="text-gray-700 font-medium"
+                className="text-foreground font-medium"
               >
                 Confirm Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
@@ -118,7 +118,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-5 w-5" />
@@ -134,20 +134,20 @@ export default function RegisterPage() {
               <input
                 type="checkbox"
                 id="terms"
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
               />
-              <label htmlFor="terms" className="text-sm text-gray-600">
+              <label htmlFor="terms" className="text-sm text-muted-foreground">
                 I agree to the{" "}
                 <Link
                   href="/terms"
-                  className="text-indigo-600 hover:text-indigo-700 font-medium"
+                  className="text-primary hover:text-primary/80 font-medium"
                 >
                   Terms and Conditions
                 </Link>{" "}
                 and{" "}
                 <Link
                   href="/privacy"
-                  className="text-indigo-600 hover:text-indigo-700 font-medium"
+                  className="text-primary hover:text-primary/80 font-medium"
                 >
                   Privacy Policy
                 </Link>
@@ -157,7 +157,7 @@ export default function RegisterPage() {
             {/* Sign Up Button */}
             <Button
               type="submit"
-              className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-base"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-base"
             >
               Create Account
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -167,10 +167,10 @@ export default function RegisterPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-medium">
+              <span className="px-4 bg-background text-muted-foreground font-medium">
                 OR SIGN UP WITH
               </span>
             </div>
@@ -181,7 +181,7 @@ export default function RegisterPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full h-12 font-medium text-gray-700 border-gray-300 hover:bg-gray-50"
+              className="w-full h-12 font-medium text-foreground border-border hover:bg-muted"
             >
               <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                 <path
@@ -207,7 +207,7 @@ export default function RegisterPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full h-12 font-medium text-gray-700 border-gray-300 hover:bg-gray-50"
+              className="w-full h-12 font-medium text-foreground border-border hover:bg-muted"
             >
               <svg className="w-5 h-5 mr-3" fill="#1877F2" viewBox="0 0 24 24">
                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
@@ -218,7 +218,7 @@ export default function RegisterPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full h-12 font-medium text-gray-700 border-gray-300 hover:bg-gray-50"
+              className="w-full h-12 font-medium text-foreground border-border hover:bg-muted"
             >
               <div className="w-5 h-5 mr-3 flex items-center justify-center bg-blue-600 rounded">
                 <Mail className="w-3 h-3 text-white" />
@@ -233,7 +233,7 @@ export default function RegisterPage() {
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="text-indigo-600 hover:text-indigo-700 font-medium"
+                className="text-primary hover:text-primary/80 font-medium"
               >
                 Sign in
               </Link>
