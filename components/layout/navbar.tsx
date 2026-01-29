@@ -2,14 +2,24 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
 import { authService } from "@/services/authService";
+import { userService, type User as AppUser } from "@/services";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { onAuthStateChanged, type User } from "firebase/auth";
+import { User as UserIcon, LogOut, Settings } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -23,16 +33,35 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [appUser, setAppUser] = useState<AppUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (!auth || !isFirebaseConfigured) return;
     const unsubscribe = onAuthStateChanged(auth, (nextUser) => {
       setUser(nextUser);
+      if (nextUser) {
+        fetchAppUser();
+      } else {
+        setAppUser(null);
+      }
     });
     return unsubscribe;
   }, []);
+
+  const fetchAppUser = async () => {
+    try {
+      const response = await userService.getProfile();
+      if (response.success) {
+        setAppUser(response.result);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user profile:", error);
+    }
+  };
 
   const handleGoogleLogin = async () => {
     try {
@@ -50,6 +79,8 @@ export function Navbar() {
     try {
       setIsAuthLoading(true);
       await authService.logout();
+      setDropdownOpen(false);
+      router.push("/");
     } catch (err) {
       console.error("Sign out failed", err);
     } finally {
@@ -101,20 +132,69 @@ export function Navbar() {
           <ThemeToggle />
 
           {user ? (
-            <div className="flex items-center gap-3">
-              <span className="hidden sm:inline text-sm text-foreground/70">
-                {user.displayName ?? user.email ?? "Signed in"}
-              </span>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleLogout}
-                disabled={isAuthLoading}
-                className="rounded-full"
-              >
-                Logout
-              </Button>
-            </div>
+            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 rounded-full p-1 hover:bg-muted transition-colors">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={appUser?.profile?.avatar_url || ""}
+                      alt={appUser?.profile?.display_name || user.email || ""}
+                    />
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                      {(
+                        appUser?.profile?.display_name ||
+                        user.displayName ||
+                        user.email ||
+                        "U"
+                      )
+                        .charAt(0)
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium text-foreground">
+                    {appUser?.profile?.display_name ||
+                      user.displayName ||
+                      "User"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    router.push("/profile");
+                    setDropdownOpen(false);
+                  }}
+                  className="cursor-pointer gap-2"
+                >
+                  <UserIcon className="h-4 w-4" />
+                  <span>My Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    router.push("/settings");
+                    setDropdownOpen(false);
+                  }}
+                  className="cursor-pointer gap-2"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  disabled={isAuthLoading}
+                  className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+                  variant="destructive"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>{isAuthLoading ? "Logging out..." : "Logout"}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <Button
               type="button"
