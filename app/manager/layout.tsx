@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -23,7 +24,7 @@ import {
   BookMarked,
   Languages,
 } from "lucide-react";
-import { authService } from "@/services";
+import { authService, userService, type User as UserType } from "@/services";
 import { usePathname } from "next/navigation";
 
 const navigation = [
@@ -41,6 +42,22 @@ export default function ManagerLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const [user, setUser] = useState<UserType | null>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await userService.getProfile();
+        if (response.success) {
+          setUser(response.result);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleLogout = async () => {
     await authService.logout();
@@ -127,18 +144,38 @@ export default function ManagerLayout({
                     className="relative h-10 w-10 rounded-full"
                   >
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src="/avatars/manager.png" alt="Manager" />
+                      <AvatarImage
+                        src={user?.profile?.avatar_url || ""}
+                        alt={
+                          user?.profile?.display_name ||
+                          user?.email ||
+                          "Manager"
+                        }
+                      />
                       <AvatarFallback className="bg-accent text-accent-foreground">
-                        MG
+                        {(user?.profile?.display_name || user?.email || "M")
+                          .charAt(0)
+                          .toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium text-foreground">
+                      {user?.profile?.display_name || user?.email}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/manager/settings">Settings</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     Log out
