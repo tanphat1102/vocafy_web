@@ -15,6 +15,17 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Edit, Trash2, DollarSign, CreditCard } from "lucide-react";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
   premiumPackageService,
   paymentMethodService,
   type PremiumPackage,
@@ -36,6 +47,30 @@ export default function AdminPaymentsPage() {
 
   // Active Tab
   const [activeTab, setActiveTab] = useState("packages");
+
+  // Package Dialog State
+  const [packageDialogOpen, setPackageDialogOpen] = useState(false);
+  const [editingPackage, setEditingPackage] = useState<PremiumPackage | null>(
+    null,
+  );
+  const [packageFormData, setPackageFormData] = useState({
+    name: "",
+    description: "",
+    price: 0,
+    duration_days: 30,
+    active: true,
+  });
+
+  // Method Dialog State
+  const [methodDialogOpen, setMethodDialogOpen] = useState(false);
+  const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(
+    null,
+  );
+  const [methodFormData, setMethodFormData] = useState({
+    provider: "",
+    description: "",
+    active: true,
+  });
 
   useEffect(() => {
     fetchPackages();
@@ -88,6 +123,44 @@ export default function AdminPaymentsPage() {
     }
   };
 
+  const handleOpenPackageDialog = (pkg?: PremiumPackage) => {
+    if (pkg) {
+      setEditingPackage(pkg);
+      setPackageFormData({
+        name: pkg.name,
+        description: pkg.description || "",
+        price: pkg.price,
+        duration_days: pkg.duration_days,
+        active: pkg.active,
+      });
+    } else {
+      setEditingPackage(null);
+      setPackageFormData({
+        name: "",
+        description: "",
+        price: 0,
+        duration_days: 30,
+        active: true,
+      });
+    }
+    setPackageDialogOpen(true);
+  };
+
+  const handleSavePackage = async () => {
+    try {
+      if (editingPackage) {
+        await premiumPackageService.update(editingPackage.id, packageFormData);
+      } else {
+        await premiumPackageService.create(packageFormData);
+      }
+      setPackageDialogOpen(false);
+      fetchPackages();
+    } catch (error) {
+      console.error("Failed to save package:", error);
+      alert("Failed to save package");
+    }
+  };
+
   const handleToggleMethodActive = async (id: number, active: boolean) => {
     try {
       await paymentMethodService.toggleActive(id, { active: !active });
@@ -95,6 +168,40 @@ export default function AdminPaymentsPage() {
     } catch (error) {
       console.error("Failed to toggle payment method:", error);
       alert("Failed to toggle payment method");
+    }
+  };
+
+  const handleOpenMethodDialog = (method?: PaymentMethod) => {
+    if (method) {
+      setEditingMethod(method);
+      setMethodFormData({
+        provider: method.provider,
+        description: method.description || "",
+        active: method.active,
+      });
+    } else {
+      setEditingMethod(null);
+      setMethodFormData({
+        provider: "",
+        description: "",
+        active: true,
+      });
+    }
+    setMethodDialogOpen(true);
+  };
+
+  const handleSaveMethod = async () => {
+    try {
+      if (editingMethod) {
+        await paymentMethodService.update(editingMethod.id, methodFormData);
+      } else {
+        await paymentMethodService.create(methodFormData);
+      }
+      setMethodDialogOpen(false);
+      fetchPaymentMethods();
+    } catch (error) {
+      console.error("Failed to save payment method:", error);
+      alert("Failed to save payment method");
     }
   };
 
@@ -187,13 +294,117 @@ export default function AdminPaymentsPage() {
           <Card className="border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-bold text-foreground">
                   Premium Packages
                 </h2>
-                <Button className="bg-indigo-600 hover:bg-indigo-700">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create Package
-                </Button>
+                <Dialog
+                  open={packageDialogOpen}
+                  onOpenChange={setPackageDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button
+                      className="bg-primary hover:bg-primary/90"
+                      onClick={() => handleOpenPackageDialog()}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Package
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>
+                        {editingPackage ? "Edit Package" : "Create Package"}
+                      </DialogTitle>
+                      <DialogDescription>
+                        {editingPackage
+                          ? "Update premium package details"
+                          : "Add a new premium package"}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="pkg-name">Package Name</Label>
+                        <Input
+                          id="pkg-name"
+                          value={packageFormData.name}
+                          onChange={(e) =>
+                            setPackageFormData({
+                              ...packageFormData,
+                              name: e.target.value,
+                            })
+                          }
+                          placeholder="e.g., Pro"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="pkg-description">Description</Label>
+                        <Textarea
+                          id="pkg-description"
+                          value={packageFormData.description}
+                          onChange={(e) =>
+                            setPackageFormData({
+                              ...packageFormData,
+                              description: e.target.value,
+                            })
+                          }
+                          placeholder="Package description"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="pkg-price">Price (VND)</Label>
+                          <Input
+                            id="pkg-price"
+                            type="number"
+                            value={packageFormData.price}
+                            onChange={(e) =>
+                              setPackageFormData({
+                                ...packageFormData,
+                                price: parseInt(e.target.value) || 0,
+                              })
+                            }
+                            placeholder="0"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="pkg-duration">Duration (days)</Label>
+                          <Input
+                            id="pkg-duration"
+                            type="number"
+                            value={packageFormData.duration_days}
+                            onChange={(e) =>
+                              setPackageFormData({
+                                ...packageFormData,
+                                duration_days: parseInt(e.target.value) || 30,
+                              })
+                            }
+                            placeholder="30"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="pkg-active"
+                          checked={packageFormData.active}
+                          onChange={(e) =>
+                            setPackageFormData({
+                              ...packageFormData,
+                              active: e.target.checked,
+                            })
+                          }
+                        />
+                        <Label htmlFor="pkg-active">Active</Label>
+                      </div>
+                      <Button
+                        onClick={handleSavePackage}
+                        className="w-full bg-primary hover:bg-primary/90"
+                      >
+                        {editingPackage ? "Update" : "Create"}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
@@ -253,6 +464,7 @@ export default function AdminPaymentsPage() {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
+                              onClick={() => handleOpenPackageDialog(pkg)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -274,7 +486,7 @@ export default function AdminPaymentsPage() {
                 {/* Pagination */}
                 {packagesTotalPages > 1 && (
                   <div className="flex items-center justify-between border-t p-4">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       Page {packagesPage + 1} of {packagesTotalPages}
                     </p>
                     <div className="flex gap-2">
@@ -313,13 +525,87 @@ export default function AdminPaymentsPage() {
           <Card className="border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-xl font-bold text-foreground">
                   Payment Methods
                 </h2>
-                <Button className="bg-indigo-600 hover:bg-indigo-700">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Payment Method
-                </Button>
+                <Dialog
+                  open={methodDialogOpen}
+                  onOpenChange={setMethodDialogOpen}
+                >
+                  <DialogTrigger asChild>
+                    <Button
+                      className="bg-primary hover:bg-primary/90"
+                      onClick={() => handleOpenMethodDialog()}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Payment Method
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>
+                        {editingMethod
+                          ? "Edit Payment Method"
+                          : "Add Payment Method"}
+                      </DialogTitle>
+                      <DialogDescription>
+                        {editingMethod
+                          ? "Update payment method details"
+                          : "Add a new payment method"}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="method-provider">Provider</Label>
+                        <Input
+                          id="method-provider"
+                          value={methodFormData.provider}
+                          onChange={(e) =>
+                            setMethodFormData({
+                              ...methodFormData,
+                              provider: e.target.value,
+                            })
+                          }
+                          placeholder="e.g., Stripe, PayPal"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="method-description">Description</Label>
+                        <Textarea
+                          id="method-description"
+                          value={methodFormData.description}
+                          onChange={(e) =>
+                            setMethodFormData({
+                              ...methodFormData,
+                              description: e.target.value,
+                            })
+                          }
+                          placeholder="Payment method description"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="method-active"
+                          checked={methodFormData.active}
+                          onChange={(e) =>
+                            setMethodFormData({
+                              ...methodFormData,
+                              active: e.target.checked,
+                            })
+                          }
+                        />
+                        <Label htmlFor="method-active">Active</Label>
+                      </div>
+                      <Button
+                        onClick={handleSaveMethod}
+                        className="w-full bg-primary hover:bg-primary/90"
+                      >
+                        {editingMethod ? "Update" : "Create"}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
@@ -372,6 +658,7 @@ export default function AdminPaymentsPage() {
                               variant="ghost"
                               size="icon"
                               className="h-8 w-8"
+                              onClick={() => handleOpenMethodDialog(method)}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -402,7 +689,7 @@ export default function AdminPaymentsPage() {
                 {/* Pagination */}
                 {methodsTotalPages > 1 && (
                   <div className="flex items-center justify-between border-t p-4">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       Page {methodsPage + 1} of {methodsTotalPages}
                     </p>
                     <div className="flex gap-2">
