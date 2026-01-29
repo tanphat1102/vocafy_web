@@ -79,8 +79,7 @@ export function middleware(request: NextRequest) {
   }
 
   // Protected routes
-  const isAdminRoute =
-    pathname.startsWith("/admin") || pathname.startsWith("/manager");
+  const isAdminRoute = pathname.startsWith("/admin");
   const isManagerRoute = pathname.startsWith("/manager");
 
   // If accessing protected route without token, redirect to login
