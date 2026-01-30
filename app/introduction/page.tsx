@@ -281,7 +281,7 @@ function VerticalBook({
           ${
             isSelected
               ? `bg-linear-to-r ${book.prism.gradient} shadow-lg`
-              : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-750"
+              : "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
           }
         `}
       >
@@ -294,7 +294,7 @@ function VerticalBook({
             ${
               isSelected
                 ? "bg-white/20"
-                : "bg-white dark:bg-gray-700 group-hover:scale-110"
+                : "dark:bg-gray-700 group-hover:scale-110"
             }
           `}
           >
@@ -362,7 +362,7 @@ function MacWindowCard({
         />
 
         {/* Main Window */}
-        <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className="relative dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
           {/* Window Title Bar (macOS style) */}
           <div
             className={`bg-linear-to-r ${book.prism.gradient} px-4 py-3 flex items-center gap-3`}
@@ -417,7 +417,7 @@ function MacWindowCard({
                       <div
                         className={`w-4 h-4 md:w-5 md:h-5 rounded-full ${book.prism.bg} shadow-lg flex items-center justify-center`}
                       >
-                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-white" />
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full" />
                       </div>
                     </div>
 
@@ -426,7 +426,7 @@ function MacWindowCard({
                       {/* Label (Left) */}
                       <div className="col-span-4 md:col-span-3">
                         <span
-                          className={`text-lg md:text-xl font-bold ${book.prism.text} dark:text-white`}
+                          className={`text-lg md:text-xl font-bold ${book.prism.text} dark:text-gray-100`}
                         >
                           {row.label}
                         </span>
@@ -434,7 +434,7 @@ function MacWindowCard({
 
                       {/* Value (Right) */}
                       <div className="col-span-8 md:col-span-9">
-                        <span className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
+                        <span className="text-base md:text-lg text-gray-700 dark:text-gray-200 leading-relaxed">
                           {row.value}
                         </span>
                       </div>
@@ -448,7 +448,7 @@ function MacWindowCard({
             <div className="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className={`w-3 h-3 rounded-full ${book.prism.bg}`} />
-                <span className="text-sm text-gray-500 dark:text-gray-400">
+                <span className="text-sm text-gray-500 dark:text-gray-300">
                   Chương {book.id} / 8
                 </span>
               </div>
@@ -495,7 +495,7 @@ export default function IntroductionPage() {
   };
 
   return (
-    <div>
+    <div className="bg-background">
       <Navbar />
 
       {/* Hero Section */}
@@ -529,7 +529,7 @@ export default function IntroductionPage() {
             <FadeInOnScroll>
               <div className="relative lg:sticky lg:top-24">
                 {/* Modern minimalist shelf */}
-                <div className="bg-white dark:bg-gray-900 rounded-2xl p-5 shadow-lg border border-gray-200 dark:border-gray-800">
+                <div className="dark:bg-gray-900 rounded-2xl p-5 shadow-lg border border-gray-200 dark:border-gray-800">
                   {/* Shelf title */}
                   <div className="text-center mb-6">
                     <h3 className="text-gray-900 dark:text-white font-bold text-base">

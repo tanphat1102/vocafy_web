@@ -28,7 +28,7 @@ import {
 
 export default function Home() {
   return (
-    <div>
+    <div className="bg-background">
       {/* Floating background elements */}
       <FloatingElements className="opacity-30 dark:opacity-20" count={6} />
 
@@ -131,7 +131,7 @@ export default function Home() {
       </section>
 
       {/* Section 1: AI-Powered Learning - Text Left, Image Right */}
-      <section className="py-16 md:py-24 bg-white dark:bg-gray-900 transition-colors duration-500">
+      <section className="py-16 md:py-24 dark:bg-gray-900 transition-colors duration-500">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <FadeInOnScroll className="space-y-6">
@@ -422,7 +422,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-white dark:bg-gray-900 transition-colors duration-500">
+      <section className="py-16 md:py-24 dark:bg-gray-900 transition-colors duration-500">
         <div className="container mx-auto px-4">
           <FadeInOnScroll className="text-center max-w-3xl mx-auto space-y-6">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold dark:text-white">

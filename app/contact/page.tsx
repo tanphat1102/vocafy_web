@@ -439,7 +439,7 @@ export default function ContactPage() {
                 <a
                   key={social.name}
                   href={social.url}
-                  className={`w-12 h-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-white/70 ${social.color} transition-all hover:scale-110 hover:bg-white/20`}
+                  className={`w-12 h-12 rounded-full bg-muted/50 dark:bg-white/10 backdrop-blur-sm flex items-center justify-center text-muted-foreground dark:text-white/70 ${social.color} transition-all hover:scale-110 hover:bg-muted dark:hover:bg-white/20`}
                   aria-label={social.name}
                 >
                   <social.icon className="w-5 h-5" />
