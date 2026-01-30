@@ -137,7 +137,7 @@ const englishCourses = [
 
 export default function SyllabusPage() {
   return (
-    <div>
+    <div className="bg-background">
       <Navbar />
 
       {/* Hero Section */}
@@ -163,7 +163,7 @@ export default function SyllabusPage() {
       </section>
 
       {/* JLPT Section */}
-      <section className="py-16 bg-white dark:bg-gray-900 transition-colors duration-500">
+      <section className="py-16  dark:bg-gray-900 transition-colors duration-500">
         <div className="container mx-auto px-4">
           <FadeInOnScroll className="text-center mb-12">
             <Badge className="bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-300 mb-4">
@@ -271,7 +271,7 @@ export default function SyllabusPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {englishCourses.map((course, i) => (
               <FadeInOnScroll key={course.title} delay={i * 100}>
-                <Card className="bg-white dark:bg-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full">
+                <Card className=" dark:bg-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full">
                   <CardHeader>
                     <div
                       className={`w-16 h-16 rounded-2xl bg-linear-to-br ${course.color} flex items-center justify-center text-white shadow-lg mb-4`}
@@ -325,7 +325,7 @@ export default function SyllabusPage() {
             <div className="flex flex-wrap justify-center gap-4 pt-4">
               <Button
                 size="lg"
-                className="bg-white text-indigo-600 hover:bg-gray-100 h-14 px-8 text-lg rounded-full"
+                className="dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 h-14 px-8 text-lg rounded-full"
               >
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5" />

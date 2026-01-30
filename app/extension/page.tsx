@@ -73,7 +73,7 @@ const features = [
 
 export default function ExtensionPage() {
   return (
-    <div>
+    <div className="bg-background">
       <FloatingElements className="opacity-30 dark:opacity-20" count={6} />
 
       <Navbar />
@@ -103,7 +103,7 @@ export default function ExtensionPage() {
             <div className="flex flex-wrap gap-4">
               <Button
                 size="lg"
-                className="bg-indigo-600 hover:bg-indigo-700 h-14 px-8 text-lg rounded-full group"
+                className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-14 px-8 text-lg rounded-full group"
               >
                 <Chrome className="w-5 h-5 mr-2" />
                 Add to Chrome
@@ -112,7 +112,7 @@ export default function ExtensionPage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-14 px-8 text-lg rounded-full dark:border-gray-600 dark:text-gray-300"
+                className="h-14 px-8 text-lg rounded-full dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
               >
                 Watch Demo
               </Button>
@@ -155,7 +155,7 @@ export default function ExtensionPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white dark:bg-gray-900 transition-colors duration-500">
+      <section className="py-16 dark:bg-gray-900 transition-colors duration-500">
         <div className="container mx-auto px-4">
           <FadeInOnScroll className="text-center mb-12">
             <Badge className="bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-300 mb-4">
@@ -174,7 +174,7 @@ export default function ExtensionPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, i) => (
               <FadeInOnScroll key={feature.title} delay={i * 100}>
-                <Card className="bg-white dark:bg-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full">
+                <Card className="dark:bg-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full">
                   <CardContent className="p-6 space-y-4">
                     <div
                       className={`w-14 h-14 rounded-2xl bg-linear-to-br ${feature.color} flex items-center justify-center text-white shadow-lg`}
