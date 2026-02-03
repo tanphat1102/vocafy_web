@@ -80,7 +80,18 @@ export function Navbar() {
       setIsAuthLoading(true);
       await authService.logout();
       setDropdownOpen(false);
-      router.push("/");
+
+      // Protected routes that require authentication
+      const protectedRoutes = ["/admin", "/manager", "/profile"];
+      const isProtectedRoute = protectedRoutes.some((route) =>
+        pathname.startsWith(route),
+      );
+
+      // Only redirect to home if on a protected route
+      if (isProtectedRoute) {
+        router.push("/");
+      }
+      // Otherwise stay on current page (public routes)
     } catch (err) {
       console.error("Sign out failed", err);
     } finally {

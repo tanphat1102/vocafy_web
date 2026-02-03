@@ -27,6 +27,8 @@ export function UnifiedNavbar({ user, onLogout }: UnifiedNavbarProps) {
   const handleLogout = async () => {
     try {
       await authService.logout();
+      // Admin and manager routes are protected, so redirect to home
+      window.location.href = "/";
       onLogout();
     } catch (error) {
       console.error("Failed to logout:", error);

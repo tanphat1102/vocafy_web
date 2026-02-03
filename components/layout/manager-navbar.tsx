@@ -23,6 +23,8 @@ export function ManagerNavbar({ user, onLogout }: ManagerNavbarProps) {
   const handleLogout = async () => {
     try {
       await authService.logout();
+      // Manager route is protected, so redirect to home
+      window.location.href = "/";
       onLogout();
     } catch (error) {
       console.error("Failed to logout:", error);
