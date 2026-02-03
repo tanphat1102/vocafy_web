@@ -14,8 +14,20 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Edit, Trash2, Search } from "lucide-react";
-import { userService, type User } from "@/services";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Edit, Trash2, Search, Crown, Calendar, Clock } from "lucide-react";
+import {
+  userService,
+  subscriptionService,
+  type User,
+  type Subscription,
+} from "@/services";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -25,6 +37,9 @@ export default function AdminUsersPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [filterRole, setFilterRole] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -61,6 +76,18 @@ export default function AdminUsersPage() {
     } catch (error) {
       console.error("Failed to delete user:", error);
       alert("Failed to delete user");
+    }
+  };
+
+  const handleViewSubscription = async (user: User) => {
+    setSelectedUser(user);
+    setSubscriptionDialogOpen(true);
+    try {
+      const data = await subscriptionService.getSubscriptionByUserId(user.id);
+      setSubscription(data);
+    } catch (error) {
+      console.error("Failed to fetch subscription:", error);
+      setSubscription(null);
     }
   };
 
@@ -207,6 +234,15 @@ export default function AdminUsersPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => handleViewSubscription(user)}
+                        title="View Subscription"
+                      >
+                        <Crown className="h-4 w-4 text-amber-500" />
+                      </Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <Edit className="h-4 w-4" />
                       </Button>
@@ -249,6 +285,92 @@ export default function AdminUsersPage() {
           </Button>
         </div>
       )}
+
+      {/* Subscription Dialog */}
+      <Dialog
+        open={subscriptionDialogOpen}
+        onOpenChange={setSubscriptionDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-amber-500" />
+              Subscription Details
+            </DialogTitle>
+            <DialogDescription>
+              {selectedUser?.profile.display_name}'s subscription information
+            </DialogDescription>
+          </DialogHeader>
+
+          {subscription ? (
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Current Plan
+                  </p>
+                  <div className="mt-1">
+                    <Badge
+                      variant={
+                        subscription.plan === "FREE" ? "outline" : "default"
+                      }
+                      className={
+                        subscription.plan === "PREMIUM"
+                          ? "bg-linear-to-r from-amber-500 to-orange-500"
+                          : subscription.plan === "PREMIUM_PLUS"
+                            ? "bg-linear-to-r from-purple-500 to-pink-500"
+                            : ""
+                      }
+                    >
+                      {subscription.plan}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Valid Until
+                  </p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm">
+                      {new Date(subscription.end_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Start Date
+                  </p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm">
+                      {new Date(subscription.start_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Last Updated
+                  </p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <p className="text-sm">
+                      {new Date(subscription.updated_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="py-8 text-center text-muted-foreground">
+              No subscription data available
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

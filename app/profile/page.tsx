@@ -24,18 +24,25 @@ import {
   LogOut,
   Activity,
   Clock,
+  Crown,
 } from "lucide-react";
 import Image from "next/image";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { CloudinaryUpload } from "@/components/ui/cloudinary-upload";
-import { userService, type User as UserType } from "@/services";
+import {
+  userService,
+  subscriptionService,
+  type User as UserType,
+  type Subscription,
+} from "@/services";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<UserType | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -61,15 +68,23 @@ export default function ProfilePage() {
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
-      const response = await userService.getProfile();
-      if (response.success) {
-        setUser(response.result);
+      const [profileResponse, subscriptionData] = await Promise.all([
+        userService.getProfile(),
+        subscriptionService.getMySubscription().catch(() => null),
+      ]);
+
+      if (profileResponse.success) {
+        setUser(profileResponse.result);
         setFormData({
-          display_name: response.result.profile?.display_name || "",
-          avatar_url: response.result.profile?.avatar_url || "",
-          locale: response.result.profile?.locale || "",
-          timezone: response.result.profile?.timezone || "",
+          display_name: profileResponse.result.profile?.display_name || "",
+          avatar_url: profileResponse.result.profile?.avatar_url || "",
+          locale: profileResponse.result.profile?.locale || "",
+          timezone: profileResponse.result.profile?.timezone || "",
         });
+      }
+
+      if (subscriptionData) {
+        setSubscription(subscriptionData);
       }
     } catch (error) {
       console.error("Failed to fetch user profile:", error);
@@ -279,6 +294,79 @@ export default function ProfilePage() {
               </div>
             </CardHeader>
           </Card>
+
+          {/* Subscription Information */}
+          {subscription && (
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-amber-500" />
+                  Subscription Plan
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Current Plan
+                    </p>
+                    <div className="mt-1">
+                      <Badge
+                        variant={
+                          subscription.plan === "FREE" ? "outline" : "default"
+                        }
+                        className={
+                          subscription.plan === "PREMIUM"
+                            ? "bg-linear-to-r from-amber-500 to-orange-500"
+                            : subscription.plan === "PREMIUM_PLUS"
+                              ? "bg-linear-to-r from-purple-500 to-pink-500"
+                              : ""
+                        }
+                      >
+                        {subscription.plan}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Valid Until
+                    </p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-foreground">
+                        {new Date(subscription.end_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Start Date
+                    </p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-foreground">
+                        {new Date(subscription.start_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Last Updated
+                    </p>
+                    <div className="mt-1 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <p className="text-foreground">
+                        {new Date(subscription.updated_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Account Information */}
           <Card>
