@@ -17,10 +17,10 @@ import DashboardLayout, {
 
 const adminNavigation: NavigationItem[] = [
   { name: "Dashboard", href: "/admin", icon: Home },
-  { name: "Syllabuses", href: "/admin/syllabuses", icon: Library },
-  { name: "Topics", href: "/admin/topics", icon: BookMarked },
-  { name: "Courses", href: "/admin/courses", icon: BookOpen },
-  { name: "Vocabularies", href: "/admin/vocabularies", icon: Languages },
+  // { name: "Syllabuses", href: "/admin/syllabuses", icon: Library },
+  // { name: "Topics", href: "/admin/topics", icon: BookMarked },
+  // { name: "Courses", href: "/admin/courses", icon: BookOpen },
+  // { name: "Vocabularies", href: "/admin/vocabularies", icon: Languages },
   { name: "Payments", href: "/admin/payments", icon: CreditCard },
   { name: "Users", href: "/admin/users", icon: Users },
 ];
