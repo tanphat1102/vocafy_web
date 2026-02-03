@@ -11,8 +11,7 @@ import {
   CreditCard,
   Receipt,
 } from "lucide-react";
-import SideBar from "./sideBar";
-import { NavigationItem } from "./dashboard-layout";
+import SideBar, { NavigationItem } from "./sideBar";
 
 const adminNavigation: NavigationItem[] = [
   { name: "Dashboard", href: "/admin", icon: Home },
