@@ -179,7 +179,7 @@ export default function PlansPage() {
                       <p className="text-4xl font-bold text-foreground">
                         {billingPeriod === "monthly" && (
                           <>
-                            ₫{Math.round(pkg.price / 1000).toLocaleString()}
+                            ₫{Math.round(pkg.price).toLocaleString()}
                             <span className="text-lg text-muted-foreground">
                               /month
                             </span>
@@ -187,10 +187,7 @@ export default function PlansPage() {
                         )}
                         {billingPeriod === "annual" && (
                           <>
-                            ₫
-                            {Math.round(
-                              (pkg.price * 12 * 0.7) / 1000,
-                            ).toLocaleString()}
+                            ₫{Math.round(pkg.price * 12 * 0.7).toLocaleString()}
                             <span className="text-lg text-muted-foreground">
                               /year
                             </span>
@@ -200,7 +197,7 @@ export default function PlansPage() {
                           <>
                             ₫
                             {Math.round(
-                              (((pkg.price * 365) / 30) * 0.6) / 1000,
+                              ((pkg.price * 365) / 30) * 0.6,
                             ).toLocaleString()}
                           </>
                         )}
