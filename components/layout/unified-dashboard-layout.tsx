@@ -5,15 +5,14 @@ import {
   Users,
   BookOpen,
   Home,
-  Settings,
   Library,
   BookMarked,
   Languages,
   CreditCard,
+  Receipt,
 } from "lucide-react";
-import DashboardLayout, {
-  NavigationItem,
-} from "@/components/layout/dashboard-layout";
+import SideBar from "./sideBar";
+import { NavigationItem } from "./dashboard-layout";
 
 const adminNavigation: NavigationItem[] = [
   { name: "Dashboard", href: "/admin", icon: Home },
@@ -22,6 +21,11 @@ const adminNavigation: NavigationItem[] = [
   // { name: "Courses", href: "/admin/courses", icon: BookOpen },
   // { name: "Vocabularies", href: "/admin/vocabularies", icon: Languages },
   { name: "Payments", href: "/admin/payments", icon: CreditCard },
+  {
+    name: "Subscriptions",
+    href: "/admin/subscription-transactions",
+    icon: Receipt,
+  },
   { name: "Users", href: "/admin/users", icon: Users },
 ];
 
@@ -48,8 +52,8 @@ export default function UnifiedDashboardLayout({
   const navigation = isAdminRoute ? adminNavigation : managerNavigation;
 
   return (
-    <DashboardLayout role={role} navigation={navigation}>
+    <SideBar role={role} navigation={navigation}>
       {children}
-    </DashboardLayout>
+    </SideBar>
   );
 }

@@ -10,16 +10,8 @@ import { auth, isFirebaseConfigured } from "@/lib/firebase";
 import { authService } from "@/services/authService";
 import { userService, type User as AppUser } from "@/services";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserProfileDropdown } from "@/components/layout/avtDropdownMenu";
 import { onAuthStateChanged, type User } from "firebase/auth";
-import { User as UserIcon, LogOut, Shield } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -37,7 +29,6 @@ export function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [appUser, setAppUser] = useState<AppUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (!auth || !isFirebaseConfigured) return;
@@ -75,28 +66,18 @@ export function Navbar() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      setIsAuthLoading(true);
-      await authService.logout();
-      setDropdownOpen(false);
+  const handleLogoutSuccess = () => {
+    // Protected routes that require authentication
+    const protectedRoutes = ["/admin", "/manager", "/profile"];
+    const isProtectedRoute = protectedRoutes.some((route) =>
+      pathname.startsWith(route),
+    );
 
-      // Protected routes that require authentication
-      const protectedRoutes = ["/admin", "/manager", "/profile"];
-      const isProtectedRoute = protectedRoutes.some((route) =>
-        pathname.startsWith(route),
-      );
-
-      // Only redirect to home if on a protected route
-      if (isProtectedRoute) {
-        router.push("/");
-      }
-      // Otherwise stay on current page (public routes)
-    } catch (err) {
-      console.error("Sign out failed", err);
-    } finally {
-      setIsAuthLoading(false);
+    // Only redirect to home if on a protected route
+    if (isProtectedRoute) {
+      router.push("/");
     }
+    // Otherwise stay on current page (public routes)
   };
 
   return (
@@ -142,190 +123,14 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <ThemeToggle />
 
-          {user ? (
-            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full p-1 hover:bg-muted transition-colors">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage
-                      src={appUser?.profile?.avatar_url || ""}
-                      alt={appUser?.profile?.display_name || user.email || ""}
-                    />
-                    <AvatarFallback className="bg-linear-to-br from-primary to-accent text-primary-foreground">
-                      {(
-                        appUser?.profile?.display_name ||
-                        user.displayName ||
-                        user.email ||
-                        "U"
-                      )
-                        .charAt(0)
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="px-2 py-1.5">
-                  <p className="text-sm font-medium text-foreground">
-                    {appUser?.profile?.display_name ||
-                      user.displayName ||
-                      "User"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                </div>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    router.push("/profile");
-                    setDropdownOpen(false);
-                  }}
-                  className="cursor-pointer gap-2"
-                >
-                  <UserIcon className="h-4 w-4" />
-                  <span>My Profile</span>
-                </DropdownMenuItem>
-
-                {/* Role-based Menu Items */}
-                {appUser?.role === "ADMIN" && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
-                      Admin Panel
-                    </div>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/admin");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Users
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/admin/payments");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Premium Packages
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/admin/payments");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Subscription Transactions
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/admin/payments");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Payment Methods
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
-                      Switch Role
-                    </div>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/manager");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <Shield className="h-4 w-4 mr-2" />
-                      Manager
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <UserIcon className="h-4 w-4 mr-2" />
-                      User
-                    </DropdownMenuItem>
-                  </>
-                )}
-
-                {appUser?.role === "MANAGER" && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
-                      Manager Panel
-                    </div>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/manager/syllabuses");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Syllabuses
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/manager/vocabularies");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Vocabularies
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/manager/courses");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Courses
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/manager/topics");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      Topics
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground">
-                      Switch Role
-                    </div>
-                    <DropdownMenuItem
-                      onClick={() => {
-                        router.push("/");
-                        setDropdownOpen(false);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <UserIcon className="h-4 w-4 mr-2" />
-                      User
-                    </DropdownMenuItem>
-                  </>
-                )}
-
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={handleLogout}
-                  disabled={isAuthLoading}
-                  className="cursor-pointer gap-2 text-destructive focus:text-destructive"
-                  variant="destructive"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>{isAuthLoading ? "Logging out..." : "Logout"}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          {user && appUser ? (
+            <UserProfileDropdown
+              user={appUser}
+              email={user.email || undefined}
+              onLogoutSuccess={handleLogoutSuccess}
+            />
+          ) : user && !appUser ? (
+            <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
           ) : (
             <Button
               type="button"
