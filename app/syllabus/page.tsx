@@ -325,7 +325,7 @@ export default function SyllabusPage() {
             <div className="flex flex-wrap justify-center gap-4 pt-4">
               <Button
                 size="lg"
-                className="dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 h-14 px-8 text-lg rounded-full"
+                className="bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 h-14 px-8 text-lg rounded-full"
               >
                 Get Started Free
                 <ArrowRight className="ml-2 h-5 w-5" />
