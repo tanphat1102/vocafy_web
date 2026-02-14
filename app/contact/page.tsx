@@ -269,27 +269,30 @@ export default function ContactPage() {
           />
         </div>
 
-        <div className="container mx-auto px-4 py-16 relative z-10">
+        <div className="container mx-auto px-4 py-12 sm:py-16 md:py-20 relative z-10">
           {/* Header */}
-          <FadeInOnScroll className="text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 drop-shadow-2xl">
+          <FadeInOnScroll className="text-center mb-12 sm:mb-14 md:mb-16">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-5 md:mb-6 drop-shadow-2xl">
               ĐỘI NGŨ{" "}
               <span className="bg-linear-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                 VOCAFY
               </span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Những con người đam mê công nghệ và giáo dục, cùng nhau xây dựng
               nền tảng học từ vựng thông minh cho cộng đồng.
             </p>
           </FadeInOnScroll>
 
           {/* Mentor */}
-          <FadeInOnScroll delay={100} className="flex justify-center mb-12">
+          <FadeInOnScroll
+            delay={100}
+            className="flex justify-center mb-10 sm:mb-12"
+          >
             <div className="text-center">
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <GraduationCap className="w-6 h-6 text-amber-400" />
-                <span className="text-amber-400 font-semibold tracking-wider uppercase text-sm">
+              <div className="flex items-center justify-center gap-2 mb-4 sm:mb-5 md:mb-6">
+                <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
+                <span className="text-amber-400 font-semibold tracking-wider uppercase text-xs sm:text-sm">
                   Mentor Hướng Dẫn
                 </span>
               </div>
@@ -307,13 +310,13 @@ export default function ContactPage() {
           </FadeInOnScroll>
 
           {/* Divider */}
-          <div className="flex items-center justify-center gap-4 my-8">
-            <div className="h-px w-24 bg-linear-to-r from-transparent to-primary/50" />
-            <Users className="w-6 h-6 text-primary" />
-            <span className="text-primary font-semibold tracking-wider uppercase text-sm">
+          <div className="flex items-center justify-center gap-3 sm:gap-4 my-6 sm:my-8">
+            <div className="h-px w-16 sm:w-20 md:w-24 bg-linear-to-r from-transparent to-primary/50" />
+            <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+            <span className="text-primary font-semibold tracking-wider uppercase text-xs sm:text-sm">
               Thành Viên
             </span>
-            <div className="h-px w-24 bg-linear-to-l from-transparent to-primary/50" />
+            <div className="h-px w-16 sm:w-20 md:w-24 bg-linear-to-l from-transparent to-primary/50" />
           </div>
 
           {/* Team Org Tree */}
@@ -367,7 +370,7 @@ export default function ContactPage() {
                       <div className="w-full max-w-md h-px bg-indigo-500/20" />
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 justify-items-center">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 justify-items-center">
                       {developers.map((dev, idx) => (
                         <div key={dev.mssv} className="relative">
                           <div className="hidden md:block absolute left-1/2 -top-6 -translate-x-1/2 w-px h-6 bg-indigo-500/25" />
@@ -411,13 +414,13 @@ export default function ContactPage() {
           </div>
 
           {/* Contact Info */}
-          <FadeInOnScroll delay={400} className="mt-16">
-            <div className="flex flex-wrap justify-center items-center gap-6 md:gap-12 text-foreground/80">
+          <FadeInOnScroll delay={400} className="mt-12 sm:mt-14 md:mt-16">
+            <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 lg:gap-12 text-foreground/80">
               <a
                 href="mailto:contact@vocafy.app"
                 className="flex items-center gap-2 hover:text-foreground transition-colors"
               >
-                <Mail className="w-5 h-5" />
+                <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>contact@vocafy.app</span>
               </a>
               <a

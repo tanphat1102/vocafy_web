@@ -79,46 +79,46 @@ export default function ExtensionPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <FadeInOnScroll className="space-y-6">
-            <Badge className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300">
-              <Chrome className="w-4 h-4 mr-2" />
+      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20 lg:py-24">
+        <div className="grid md:grid-cols-2 gap-8 sm:gap-10 md:gap-12 items-center">
+          <FadeInOnScroll className="space-y-4 sm:space-y-6">
+            <Badge className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-sm sm:text-base">
+              <Chrome className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               Browser Extension
             </Badge>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight dark:text-white">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight dark:text-white px-2">
               Learn Vocabulary{" "}
               <span className="text-indigo-600 dark:text-indigo-400">
                 While Browsing
               </span>
             </h1>
 
-            <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 leading-relaxed px-2">
               Our Chrome extension turns every website into a learning
               opportunity. Double-click any word to instantly translate and save
               it to your vocabulary list.
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 px-2">
               <Button
                 size="lg"
-                className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-14 px-8 text-lg rounded-full group"
+                className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg rounded-full group w-full sm:w-auto"
               >
-                <Chrome className="w-5 h-5 mr-2" />
+                <Chrome className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Add to Chrome
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button
                 size="lg"
                 variant="outline"
-                className="h-14 px-8 text-lg rounded-full dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                className="h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg rounded-full dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 w-full sm:w-auto"
               >
                 Watch Demo
               </Button>
             </div>
 
-            <div className="flex items-center gap-6 pt-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 pt-4 px-2">
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map((i) => (
                   <Star

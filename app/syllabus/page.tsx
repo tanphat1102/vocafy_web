@@ -141,21 +141,21 @@ export default function SyllabusPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-16 md:py-24">
-        <FadeInOnScroll className="text-center max-w-4xl mx-auto space-y-6">
-          <Badge className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300">
-            <GraduationCap className="w-4 h-4 mr-2" />
+      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20 lg:py-24">
+        <FadeInOnScroll className="text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
+          <Badge className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-sm sm:text-base">
+            <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
             Learning Paths
           </Badge>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight dark:text-white">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight dark:text-white px-2">
             Structured{" "}
             <span className="text-indigo-600 dark:text-indigo-400">
               Learning Syllabus
             </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-2">
             Follow our carefully designed curriculum to master Japanese and
             English vocabulary efficiently.
           </p>
@@ -163,23 +163,23 @@ export default function SyllabusPage() {
       </section>
 
       {/* JLPT Section */}
-      <section className="py-16  dark:bg-gray-900 transition-colors duration-500">
+      <section className="py-12 sm:py-16 dark:bg-gray-900 transition-colors duration-500">
         <div className="container mx-auto px-4">
-          <FadeInOnScroll className="text-center mb-12">
-            <Badge className="bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-300 mb-4">
-              <BookOpen className="w-4 h-4 mr-2" />
+          <FadeInOnScroll className="text-center mb-8 sm:mb-10 md:mb-12">
+            <Badge className="bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-300 mb-3 sm:mb-4 text-sm sm:text-base">
+              <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               Japanese Language
             </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold dark:text-white">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold dark:text-white px-2">
               JLPT Preparation Courses
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 mt-4 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-3 sm:mt-4 max-w-2xl mx-auto px-4">
               From complete beginner to fluent speaker, our JLPT courses cover
               all five levels.
             </p>
           </FadeInOnScroll>
 
-          <div className="grid gap-6 md:gap-8">
+          <div className="grid gap-4 sm:gap-6 md:gap-8">
             {jlptLevels.map((level, i) => (
               <FadeInOnScroll key={level.level} delay={i * 100}>
                 <Card

@@ -60,22 +60,22 @@ export default function PlansPage() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="py-12 px-4 sm:px-6 lg:px-8">
+      <div className="py-8 sm:py-10 md:py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
+          <div className="text-center mb-8 sm:mb-10 md:mb-12">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4">
               Learn without limits
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-lg sm:text-xl text-muted-foreground mb-6 sm:mb-8">
               Join 370,000 learners committed to PRO
             </p>
 
             {/* Billing Toggle */}
-            <div className="flex items-center justify-center gap-4 mb-12">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-10 md:mb-12">
               <button
                 onClick={() => setBillingPeriod("monthly")}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                className={`px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg font-medium transition-all ${
                   billingPeriod === "monthly"
                     ? "bg-primary text-primary-foreground"
                     : "text-foreground hover:bg-muted"
@@ -85,7 +85,7 @@ export default function PlansPage() {
               </button>
               <button
                 onClick={() => setBillingPeriod("annual")}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                className={`px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg font-medium transition-all ${
                   billingPeriod === "annual"
                     ? "bg-primary text-primary-foreground"
                     : "text-foreground hover:bg-muted"
@@ -95,7 +95,7 @@ export default function PlansPage() {
               </button>
               <button
                 onClick={() => setBillingPeriod("lifetime")}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                className={`px-3 sm:px-4 py-2 text-sm sm:text-base rounded-lg font-medium transition-all ${
                   billingPeriod === "lifetime"
                     ? "bg-primary text-primary-foreground"
                     : "text-foreground hover:bg-muted"
@@ -107,16 +107,18 @@ export default function PlansPage() {
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12">
             {/* Free Plan */}
             <Card className="border-2 border-border bg-card overflow-hidden">
               <CardHeader>
-                <CardTitle className="text-2xl">Free</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl">Free</CardTitle>
                 <CardDescription>Get started with the basics</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 sm:space-y-6">
                 <div>
-                  <p className="text-4xl font-bold text-foreground">Free</p>
+                  <p className="text-3xl sm:text-4xl font-bold text-foreground">
+                    Free
+                  </p>
                   <p className="text-sm text-muted-foreground mt-2">
                     Forever free
                   </p>
@@ -126,10 +128,13 @@ export default function PlansPage() {
                   Get Started
                 </Button>
 
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {DEFAULT_FEATURES.slice(0, 3).map((feature, index) => (
-                    <div key={index} className="flex gap-3 items-start">
-                      <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                    <div
+                      key={index}
+                      className="flex gap-2 sm:gap-3 items-start"
+                    >
+                      <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0 mt-0.5" />
                       <span className="text-sm text-foreground">{feature}</span>
                     </div>
                   ))}
@@ -141,7 +146,7 @@ export default function PlansPage() {
             {loading ? (
               <Card className="border-2 border-border bg-card overflow-hidden">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Pro</CardTitle>
+                  <CardTitle className="text-xl sm:text-2xl">Pro</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
@@ -160,9 +165,11 @@ export default function PlansPage() {
                   }`}
                 >
                   <CardHeader>
-                    <div className="flex items-start justify-between mb-2">
+                    <div className="flex flex-col sm:flex-row items-start justify-between mb-2 gap-2">
                       <div>
-                        <CardTitle className="text-2xl">{pkg.name}</CardTitle>
+                        <CardTitle className="text-xl sm:text-2xl">
+                          {pkg.name}
+                        </CardTitle>
                         <CardDescription>
                           {pkg.description || "Premium features"}
                         </CardDescription>
@@ -174,9 +181,9 @@ export default function PlansPage() {
                       )}
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-4 sm:space-y-6">
                     <div>
-                      <p className="text-4xl font-bold text-foreground">
+                      <p className="text-3xl sm:text-4xl font-bold text-foreground">
                         {billingPeriod === "monthly" && (
                           <>
                             ₫{Math.round(pkg.price).toLocaleString()}
@@ -222,10 +229,13 @@ export default function PlansPage() {
                       Subscribe now
                     </Button>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2 sm:space-y-3">
                       {DEFAULT_FEATURES.map((feature, index) => (
-                        <div key={index} className="flex gap-3 items-start">
-                          <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                        <div
+                          key={index}
+                          className="flex gap-2 sm:gap-3 items-start"
+                        >
+                          <Check className="w-4 h-4 sm:w-5 sm:h-5 text-primary shrink-0 mt-0.5" />
                           <span className="text-sm text-foreground">
                             {feature}
                           </span>
@@ -238,7 +248,7 @@ export default function PlansPage() {
             ) : (
               <Card className="border-2 border-border bg-card overflow-hidden">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Pro</CardTitle>
+                  <CardTitle className="text-xl sm:text-2xl">Pro</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">

@@ -72,6 +72,10 @@ function getRefreshToken(): string | null {
   return window.localStorage.getItem(AUTH_REFRESH_TOKEN_STORAGE_KEY);
 }
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BACKEND_URL ||
+  "https://vocafy.milize-lena.space/api";
+
 async function signInWithGoogleAndSync(): Promise<{
   user: User;
   accessToken: string;
@@ -90,19 +94,17 @@ async function signInWithGoogleAndSync(): Promise<{
   const user = result.user;
   const idToken = await user.getIdToken();
 
-  // Sync with backend API
-  const response = await fetch(
-    "https://vocafy.milize-lena.space/api/auth/firebase",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id_token: idToken,
-      }),
+  // Sync with backend API using new /api/auth/firebase endpoint
+  const response = await fetch(`${API_BASE_URL}/auth/firebase`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      id_token: idToken,
+      fcm_token: "", // Optional: Add FCM token for push notifications if needed
+    }),
+  });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
@@ -122,11 +124,30 @@ async function signInWithGoogleAndSync(): Promise<{
 }
 
 async function logout(): Promise<void> {
-  if (!auth || !isFirebaseConfigured) {
-    removeTokensFromLocalStorage();
-    return;
+  // Call backend logout endpoint if we have an access token
+  const accessToken = getAccessToken();
+
+  if (accessToken) {
+    try {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    } catch (error) {
+      console.error("Backend logout failed:", error);
+      // Continue with local logout even if backend call fails
+    }
   }
-  await signOut(auth);
+
+  // Sign out from Firebase
+  if (auth && isFirebaseConfigured) {
+    await signOut(auth);
+  }
+
+  // Clear local tokens
   removeTokensFromLocalStorage();
 }
 
@@ -144,18 +165,15 @@ async function refreshAccessToken(): Promise<string> {
     throw new Error("No refresh token available");
   }
 
-  const response = await fetch(
-    "https://vocafy.milize-lena.space/api/auth/refresh",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        refresh_token: refreshToken,
-      }),
+  const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify({
+      refresh_token: refreshToken,
+    }),
+  });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));

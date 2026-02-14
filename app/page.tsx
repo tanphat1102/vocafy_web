@@ -35,17 +35,17 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section - Centered Layout */}
-      <section className="container mx-auto px-4 py-16 md:py-24 relative">
-        <FadeInOnScroll className="text-center max-w-4xl mx-auto space-y-6">
+      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20 lg:py-24 relative">
+        <FadeInOnScroll className="text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
           <Badge
             variant="secondary"
-            className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 px-4 py-1.5 animate-bounce-in"
+            className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 px-3 py-1 sm:px-4 sm:py-1.5 text-sm sm:text-base animate-bounce-in"
           >
-            <Sparkles className="w-4 h-4 mr-2 inline animate-pulse" />
+            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-2 inline animate-pulse" />
             AI-Powered Vocabulary Learning
           </Badge>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight dark:text-white">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight dark:text-white px-2">
             A powerful vocabulary learning tool{" "}
             <br className="hidden md:block" />
             that&apos;s{" "}
@@ -59,50 +59,50 @@ export default function Home() {
             to use.
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl mx-auto px-2">
             With stellar AI-powered learning and unmatched support, see how
             Vocafy will make a difference in your language journey.
           </p>
 
-          <div className="pt-4">
+          <div className="pt-4 sm:pt-6">
             <Button
               size="lg"
-              className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-14 px-8 text-lg font-medium group rounded-full"
+              className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg font-medium group rounded-full"
             >
               Get started free
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </FadeInOnScroll>
 
         {/* Circle Images Section - Cloud-like frame */}
-        <FadeInOnScroll delay={300} className="mt-16">
-          <div className="relative flex justify-center items-end gap-2 md:gap-4 py-8 overflow-hidden">
+        <FadeInOnScroll delay={300} className="mt-8 sm:mt-12 md:mt-16">
+          <div className="relative flex justify-center items-end gap-1 sm:gap-2 md:gap-4 py-6 sm:py-8 overflow-hidden">
             {/* Circle frames for images */}
-            <MouseFollowImage intensity={8} className="hidden sm:block">
-              <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl bg-linear-to-br from-indigo-200 to-blue-200 dark:from-indigo-900 dark:to-blue-900 -rotate-6 hover:rotate-0 transition-all duration-500 hover:scale-105">
+            <MouseFollowImage intensity={8} className="hidden xs:block">
+              <div className="w-20 sm:w-28 md:w-40 h-20 sm:h-28 md:h-40 rounded-full overflow-hidden border-2 sm:border-4 border-white dark:border-gray-700 shadow-xl bg-linear-to-br from-indigo-200 to-blue-200 dark:from-indigo-900 dark:to-blue-900 -rotate-6 hover:rotate-0 transition-all duration-500 hover:scale-105">
                 <div className="w-full h-full flex items-center justify-center bg-indigo-100 dark:bg-indigo-800">
-                  <BookOpen className="w-12 h-12 md:w-16 md:h-16 text-indigo-600 dark:text-indigo-300" />
+                  <BookOpen className="w-8 sm:w-12 md:w-16 h-8 sm:h-12 md:h-16 text-indigo-600 dark:text-indigo-300" />
                 </div>
               </div>
             </MouseFollowImage>
 
             <MouseFollowImage intensity={10}>
-              <div className="w-36 h-36 md:w-52 md:h-52 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-2xl bg-linear-to-br from-purple-200 to-pink-200 dark:from-purple-900 dark:to-pink-900 hover:scale-105 transition-all duration-500">
+              <div className="w-24 sm:w-36 md:w-52 h-24 sm:h-36 md:h-52 rounded-full overflow-hidden border-2 sm:border-4 border-white dark:border-gray-700 shadow-2xl bg-linear-to-br from-purple-200 to-pink-200 dark:from-purple-900 dark:to-pink-900 hover:scale-105 transition-all duration-500">
                 <div className="w-full h-full flex items-center justify-center bg-purple-100 dark:bg-purple-800">
-                  <Brain className="w-16 h-16 md:w-24 md:h-24 text-purple-600 dark:text-purple-300" />
+                  <Brain className="w-10 sm:w-16 md:w-24 h-10 sm:h-16 md:h-24 text-purple-600 dark:text-purple-300" />
                 </div>
               </div>
             </MouseFollowImage>
 
             <MouseFollowImage intensity={12}>
-              <div className="w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-2xl bg-linear-to-br from-emerald-200 to-teal-200 dark:from-emerald-900 dark:to-teal-900 hover:scale-105 transition-all duration-500 relative">
+              <div className="w-28 sm:w-40 md:w-56 h-28 sm:h-40 md:h-56 rounded-full overflow-hidden border-2 sm:border-4 border-white dark:border-gray-700 shadow-2xl bg-linear-to-br from-emerald-200 to-teal-200 dark:from-emerald-900 dark:to-teal-900 hover:scale-105 transition-all duration-500 relative">
                 <div className="w-full h-full flex items-center justify-center bg-emerald-100 dark:bg-emerald-800 relative">
                   <div className="text-center">
-                    <div className="text-5xl md:text-7xl font-bold text-emerald-600 dark:text-emerald-300">
+                    <div className="text-3xl sm:text-5xl md:text-7xl font-bold text-emerald-600 dark:text-emerald-300">
                       V
                     </div>
-                    <div className="text-sm md:text-base font-medium text-emerald-700 dark:text-emerald-400">
+                    <div className="text-xs sm:text-sm md:text-base font-medium text-emerald-700 dark:text-emerald-400">
                       Vocafy
                     </div>
                   </div>
@@ -112,17 +112,17 @@ export default function Home() {
             </MouseFollowImage>
 
             <MouseFollowImage intensity={10}>
-              <div className="w-32 h-32 md:w-48 md:h-48 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl bg-linear-to-br from-amber-200 to-orange-200 dark:from-amber-900 dark:to-orange-900 rotate-3 hover:rotate-0 transition-all duration-500 hover:scale-105">
+              <div className="w-24 sm:w-32 md:w-48 h-24 sm:h-32 md:h-48 rounded-full overflow-hidden border-2 sm:border-4 border-white dark:border-gray-700 shadow-xl bg-linear-to-br from-amber-200 to-orange-200 dark:from-amber-900 dark:to-orange-900 rotate-3 hover:rotate-0 transition-all duration-500 hover:scale-105">
                 <div className="w-full h-full flex items-center justify-center bg-amber-100 dark:bg-amber-800">
-                  <Target className="w-14 h-14 md:w-20 md:h-20 text-amber-600 dark:text-amber-300" />
+                  <Target className="w-10 sm:w-14 md:w-20 h-10 sm:h-14 md:h-20 text-amber-600 dark:text-amber-300" />
                 </div>
               </div>
             </MouseFollowImage>
 
-            <MouseFollowImage intensity={8} className="hidden sm:block">
-              <div className="w-28 h-28 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white dark:border-gray-700 shadow-xl bg-linear-to-br from-rose-200 to-red-200 dark:from-rose-900 dark:to-red-900 -rotate-3 hover:rotate-0 transition-all duration-500 hover:scale-105">
+            <MouseFollowImage intensity={8} className="hidden xs:block">
+              <div className="w-20 sm:w-28 md:w-40 h-20 sm:h-28 md:h-40 rounded-full overflow-hidden border-2 sm:border-4 border-white dark:border-gray-700 shadow-xl bg-linear-to-br from-rose-200 to-red-200 dark:from-rose-900 dark:to-red-900 -rotate-3 hover:rotate-0 transition-all duration-500 hover:scale-105">
                 <div className="w-full h-full flex items-center justify-center bg-rose-100 dark:bg-rose-800">
-                  <Zap className="w-12 h-12 md:w-16 md:h-16 text-rose-600 dark:text-rose-300" />
+                  <Zap className="w-8 sm:w-12 md:w-16 h-8 sm:h-12 md:h-16 text-rose-600 dark:text-rose-300" />
                 </div>
               </div>
             </MouseFollowImage>
@@ -131,47 +131,47 @@ export default function Home() {
       </section>
 
       {/* Section 1: AI-Powered Learning - Text Left, Image Right */}
-      <section className="py-16 md:py-24 dark:bg-gray-900 transition-colors duration-500">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 dark:bg-gray-900 transition-colors duration-500">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <FadeInOnScroll className="space-y-6">
-              <Badge className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300">
-                <Sparkles className="w-4 h-4 mr-2" />
+          <div className="grid md:grid-cols-2 gap-8 sm:gap-10 md:gap-12 items-center">
+            <FadeInOnScroll className="space-y-4 sm:space-y-6">
+              <Badge className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-sm sm:text-base">
+                <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 AI-Powered
               </Badge>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white">
                 Learn Smarter with{" "}
                 <span className="text-indigo-600 dark:text-indigo-400">
                   Artificial Intelligence
                 </span>
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                 Our AI adapts to your learning style, identifies your weak
                 points, and creates personalized study paths. Experience
                 learning that evolves with you.
               </p>
-              <div className="flex items-center gap-8 pt-4">
+              <div className="flex items-center gap-4 sm:gap-6 md:gap-8 pt-2 sm:pt-4">
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+                  <p className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">
                     <CountingNumber value={95} suffix="%" />
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     Accuracy
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                  <p className="text-2xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400">
                     <CountingNumber value={3} suffix="x" />
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     Faster Learning
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                  <p className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400">
                     <CountingNumber value={10} suffix="K+" />
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     Users
                   </p>
                 </div>
@@ -180,12 +180,14 @@ export default function Home() {
 
             <FadeInOnScroll delay={200}>
               <MouseFollowImage intensity={12} glowEffect>
-                <div className="aspect-square max-w-md mx-auto bg-linear-to-br from-indigo-400 via-purple-400 to-pink-400 rounded-3xl shadow-2xl overflow-hidden relative group">
+                <div className="aspect-square max-w-xs sm:max-w-sm md:max-w-md mx-auto bg-linear-to-br from-indigo-400 via-purple-400 to-pink-400 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden relative group">
                   <div className="absolute inset-0 bg-linear-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 animate-gradient-x" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="text-white text-center group-hover:scale-110 transition-transform duration-500">
-                      <Brain className="w-24 h-24 mx-auto mb-4" />
-                      <div className="text-2xl font-bold">AI Learning</div>
+                      <Brain className="w-16 sm:w-20 md:w-24 h-16 sm:h-20 md:h-24 mx-auto mb-2 sm:mb-4" />
+                      <div className="text-lg sm:text-xl md:text-2xl font-bold">
+                        AI Learning
+                      </div>
                     </div>
                   </div>
                   <ParticleField particleCount={20} />
@@ -197,9 +199,9 @@ export default function Home() {
       </section>
 
       {/* Section 2: Multi-Language - Text Right, Image Left */}
-      <section className="py-16 md:py-24 bg-blue-50 dark:bg-blue-950/30 transition-colors duration-500">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-blue-50 dark:bg-blue-950/30 transition-colors duration-500">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="grid md:grid-cols-2 gap-8 sm:gap-10 md:gap-12 items-center">
             <FadeInOnScroll delay={200} className="md:order-1">
               <MouseFollowImage intensity={12} glowEffect>
                 <div className="aspect-square max-w-md mx-auto bg-linear-to-br from-blue-400 via-cyan-400 to-teal-400 rounded-3xl shadow-2xl overflow-hidden relative group">
@@ -215,12 +217,12 @@ export default function Home() {
               </MouseFollowImage>
             </FadeInOnScroll>
 
-            <FadeInOnScroll className="space-y-6 md:order-2">
-              <Badge className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300">
-                <Languages className="w-4 h-4 mr-2" />
+            <FadeInOnScroll className="space-y-4 sm:space-y-6 md:order-2">
+              <Badge className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 text-sm sm:text-base">
+                <Languages className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 Multi-Language
               </Badge>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white">
                 Master{" "}
                 <span className="text-blue-600 dark:text-blue-400">
                   Japanese
@@ -382,22 +384,22 @@ export default function Home() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 md:py-24 bg-linear-to-br from-indigo-600 via-indigo-700 to-purple-700 relative overflow-hidden">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-linear-to-br from-indigo-600 via-indigo-700 to-purple-700 relative overflow-hidden">
         <div className="absolute inset-0">
           <ParticleField particleCount={30} />
         </div>
         <div className="container mx-auto px-4 relative z-10">
-          <FadeInOnScroll className="text-center text-white mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <FadeInOnScroll className="text-center text-white mb-8 sm:mb-10 md:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-4">
               Trusted by Thousands of Learners
             </h2>
-            <p className="text-lg text-indigo-100 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-indigo-100 max-w-2xl mx-auto px-4">
               Join our growing community and start your language learning
               journey today.
             </p>
           </FadeInOnScroll>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
             {[
               { value: 10000, suffix: "+", label: "Active Users" },
               { value: 50000, suffix: "+", label: "Vocabularies" },
@@ -406,14 +408,16 @@ export default function Home() {
             ].map((stat, i) => (
               <FadeInOnScroll key={i} delay={i * 100}>
                 <div className="text-center">
-                  <p className="text-4xl md:text-5xl font-bold text-white mb-2">
+                  <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-1 sm:mb-2">
                     <CountingNumber
                       value={stat.value}
                       suffix={stat.suffix}
                       decimals={stat.decimals}
                     />
                   </p>
-                  <p className="text-indigo-200">{stat.label}</p>
+                  <p className="text-xs sm:text-sm md:text-base text-indigo-200">
+                    {stat.label}
+                  </p>
                 </div>
               </FadeInOnScroll>
             ))}
@@ -422,33 +426,33 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 dark:bg-gray-900 transition-colors duration-500">
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 dark:bg-gray-900 transition-colors duration-500">
         <div className="container mx-auto px-4">
-          <FadeInOnScroll className="text-center max-w-3xl mx-auto space-y-6">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold dark:text-white">
+          <FadeInOnScroll className="text-center max-w-3xl mx-auto space-y-4 sm:space-y-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold dark:text-white px-2">
               Ready to Start Your{" "}
               <span className="text-indigo-600 dark:text-indigo-400">
                 Learning Journey
               </span>
               ?
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
+            <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 px-2">
               Join thousands of learners who have already transformed their
               vocabulary skills with Vocafy.
             </p>
-            <div className="flex flex-wrap justify-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 pt-4 px-4">
               <Button
                 size="lg"
-                className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-14 px-8 text-lg rounded-full group"
+                className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg rounded-full group w-full sm:w-auto"
               >
                 Get Started Free
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <Link href="/introduction">
+              <Link href="/introduction" className="w-full sm:w-auto">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="h-14 px-8 text-lg rounded-full dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                  className="h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg rounded-full dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800 w-full"
                 >
                   Learn More
                 </Button>

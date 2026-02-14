@@ -499,31 +499,31 @@ export default function IntroductionPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 pt-16 pb-6 md:pt-20 md:pb-6 relative">
+      <section className="container mx-auto px-4 pt-12 pb-6 sm:pt-16 md:pt-20 md:pb-6 relative">
         <FadeInOnScroll className="text-center max-w-3xl mx-auto">
           <Badge
             variant="secondary"
-            className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 mb-4"
+            className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 mb-3 sm:mb-4 text-sm sm:text-base"
           >
-            <BookOpen className="w-4 h-4 mr-2 inline" />
+            <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-2 inline" />
             Giới Thiệu Vocafy
           </Badge>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight dark:text-white mb-3 sm:mb-4 px-2">
             Thư Viện{" "}
             <span className="bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               Kiến Thức
             </span>{" "}
             Vocafy
           </h1>
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed px-4">
             Chọn sách từ kệ để mở và đọc nội dung chi tiết
           </p>
         </FadeInOnScroll>
       </section>
 
       {/* Main Content: Bookshelf + Window Card */}
-      <section className="container mx-auto px-4 py-6 md:py-8">
-        <div className="grid lg:grid-cols-12 gap-6 md:gap-8 max-w-7xl mx-auto">
+      <section className="container mx-auto px-4 py-4 sm:py-6 md:py-8">
+        <div className="grid lg:grid-cols-12 gap-4 sm:gap-6 md:gap-8 max-w-7xl mx-auto">
           {/* Left: Vertical Bookshelf */}
           <div className="lg:col-span-3">
             <FadeInOnScroll>
