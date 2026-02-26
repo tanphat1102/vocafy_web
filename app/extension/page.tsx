@@ -102,12 +102,15 @@ export default function ExtensionPage() {
 
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 px-2">
               <Button
+                asChild
                 size="lg"
                 className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 h-12 sm:h-14 px-6 sm:px-8 text-base sm:text-lg rounded-full group w-full sm:w-auto"
               >
-                <Chrome className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Add to Chrome
-                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
+                <a href="/Vocafy-Extension.zip" download>
+                  <Chrome className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Add to Chrome
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
+                </a>
               </Button>
               <Button
                 size="lg"
