@@ -31,6 +31,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { dashboardService } from "@/services";
 
 interface Stats {
   totalUsers: number;
@@ -39,34 +40,179 @@ interface Stats {
   activeEnrollments: number;
   totalRevenue: number;
   growthRate: number;
+  usersGrowthRate: number;
+  syllabusesGrowthRate: number;
+  vocabulariesGrowthRate: number;
+  activeEnrollmentsGrowthRate: number;
+  revenueGrowthRate: number;
+  reportYear: number;
+  reportMonth: number;
 }
 
+const toSafeNumber = (value: unknown, fallback = 0): number => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return fallback;
+};
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<Stats>({
-    totalUsers: 0,
-    totalSyllabuses: 0,
-    totalVocabularies: 0,
-    activeEnrollments: 0,
-    totalRevenue: 0,
-    growthRate: 0,
+  const [stats, setStats] = useState<Stats>(() => {
+    const now = new Date();
+    return {
+      totalUsers: 0,
+      totalSyllabuses: 0,
+      totalVocabularies: 0,
+      activeEnrollments: 0,
+      totalRevenue: 0,
+      growthRate: 0,
+      usersGrowthRate: 0,
+      syllabusesGrowthRate: 0,
+      vocabulariesGrowthRate: 0,
+      activeEnrollmentsGrowthRate: 0,
+      revenueGrowthRate: 0,
+      reportYear: now.getFullYear(),
+      reportMonth: now.getMonth() + 1,
+    };
   });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Fetch stats from API
-    // For now, using mock data
-    setTimeout(() => {
-      setStats({
-        totalUsers: 1234,
-        totalSyllabuses: 45,
-        totalVocabularies: 15678,
-        activeEnrollments: 892,
-        totalRevenue: 25000,
-        growthRate: 12.5,
-      });
-      setIsLoading(false);
-    }, 500);
+    const fetchStats = async () => {
+      const now = new Date();
+      const params = {
+        year: now.getFullYear(),
+        month: now.getMonth() + 1,
+      };
+
+      try {
+        const [
+          vocabulariesResponse,
+          usersResponse,
+          syllabiResponse,
+          revenueResponse,
+          growthRatesResponse,
+          activeEnrollmentsResponse,
+        ] = await Promise.all([
+          dashboardService.getVocabularies(params),
+          dashboardService.getUsers(params),
+          dashboardService.getSyllabi(params),
+          dashboardService.getRevenue(params),
+          dashboardService.getGrowthRates(params),
+          dashboardService.getActiveEnrollments(params),
+        ]);
+
+        setStats({
+          totalUsers: toSafeNumber(usersResponse?.result?.count),
+          totalSyllabuses: toSafeNumber(syllabiResponse?.result?.count),
+          totalVocabularies: toSafeNumber(vocabulariesResponse?.result?.count),
+          activeEnrollments: toSafeNumber(
+            activeEnrollmentsResponse?.result?.count,
+          ),
+          totalRevenue: toSafeNumber(revenueResponse?.result?.count),
+          growthRate: toSafeNumber(growthRatesResponse?.result?.growth_rate),
+          usersGrowthRate: toSafeNumber(usersResponse?.result?.growth_rate),
+          syllabusesGrowthRate: toSafeNumber(
+            syllabiResponse?.result?.growth_rate,
+          ),
+          vocabulariesGrowthRate: toSafeNumber(
+            vocabulariesResponse?.result?.growth_rate,
+          ),
+          activeEnrollmentsGrowthRate: toSafeNumber(
+            activeEnrollmentsResponse?.result?.growth_rate,
+          ),
+          revenueGrowthRate: toSafeNumber(revenueResponse?.result?.growth_rate),
+          reportYear: toSafeNumber(
+            growthRatesResponse?.result?.year,
+            params.year,
+          ),
+          reportMonth: toSafeNumber(
+            growthRatesResponse?.result?.month,
+            params.month,
+          ),
+        });
+      } catch (error) {
+        console.error("Failed to fetch dashboard statistics:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
   }, []);
+
+  const formatChange = (value: unknown): string => {
+    const numberValue = toSafeNumber(value);
+    const sign = numberValue > 0 ? "+" : "";
+    return `${sign}${numberValue.toFixed(1)}%`;
+  };
+
+  const formatVndCurrency = (value: unknown): string => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      maximumFractionDigits: 0,
+    }).format(toSafeNumber(value));
+  };
+
+  const statsCards = [
+    {
+      name: "Total Users",
+      value: stats.totalUsers.toLocaleString(),
+      icon: Users,
+      bgColor: "bg-chart-1/10",
+      iconColor: "text-chart-1",
+      change: formatChange(stats.usersGrowthRate),
+    },
+    {
+      name: "Syllabuses",
+      value: stats.totalSyllabuses.toLocaleString(),
+      icon: Library,
+      bgColor: "bg-chart-2/10",
+      iconColor: "text-chart-2",
+      change: formatChange(stats.syllabusesGrowthRate),
+    },
+    {
+      name: "Vocabularies",
+      value: stats.totalVocabularies.toLocaleString(),
+      icon: BookOpen,
+      bgColor: "bg-chart-3/10",
+      iconColor: "text-chart-3",
+      change: formatChange(stats.vocabulariesGrowthRate),
+    },
+    {
+      name: "Active Enrollments",
+      value: stats.activeEnrollments.toLocaleString(),
+      icon: Activity,
+      bgColor: "bg-chart-4/10",
+      iconColor: "text-chart-4",
+      change: formatChange(stats.activeEnrollmentsGrowthRate),
+    },
+    {
+      name: "Total Revenue",
+      value: formatVndCurrency(stats.totalRevenue),
+      icon: DollarSign,
+      bgColor: "bg-chart-5/10",
+      iconColor: "text-chart-5",
+      change: formatChange(stats.revenueGrowthRate),
+    },
+    {
+      name: "Growth Rate",
+      value: `${toSafeNumber(stats.growthRate).toFixed(1)}%`,
+      icon: TrendingUp,
+      bgColor: "bg-primary/10",
+      iconColor: "text-primary",
+      change: formatChange(stats.growthRate),
+    },
+  ];
 
   // Chart data for revenue by month
   const revenueData = [
@@ -92,57 +238,6 @@ export default function AdminDashboard() {
     { name: "Vocabularies", value: 15678, fill: "var(--color-chart-5)" },
   ];
 
-  const statsCards = [
-    {
-      name: "Total Users",
-      value: stats.totalUsers.toLocaleString(),
-      icon: Users,
-      bgColor: "bg-chart-1/10",
-      iconColor: "text-chart-1",
-      change: "+12%",
-    },
-    {
-      name: "Syllabuses",
-      value: stats.totalSyllabuses.toLocaleString(),
-      icon: Library,
-      bgColor: "bg-chart-2/10",
-      iconColor: "text-chart-2",
-      change: "+5%",
-    },
-    {
-      name: "Vocabularies",
-      value: stats.totalVocabularies.toLocaleString(),
-      icon: BookOpen,
-      bgColor: "bg-chart-3/10",
-      iconColor: "text-chart-3",
-      change: "+18%",
-    },
-    {
-      name: "Active Enrollments",
-      value: stats.activeEnrollments.toLocaleString(),
-      icon: Activity,
-      bgColor: "bg-chart-4/10",
-      iconColor: "text-chart-4",
-      change: "+8%",
-    },
-    {
-      name: "Total Revenue",
-      value: `$${stats.totalRevenue.toLocaleString()}`,
-      icon: DollarSign,
-      bgColor: "bg-chart-5/10",
-      iconColor: "text-chart-5",
-      change: "+15%",
-    },
-    {
-      name: "Growth Rate",
-      value: `${stats.growthRate}%`,
-      icon: TrendingUp,
-      bgColor: "bg-primary/10",
-      iconColor: "text-primary",
-      change: "+2.5%",
-    },
-  ];
-
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -156,7 +251,7 @@ export default function AdminDashboard() {
       <div>
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
         <p className="mt-2 text-muted-foreground">
-          Welcome to the admin dashboard
+          Dashboard report for {stats.reportMonth}/{stats.reportYear}
         </p>
       </div>
 
