@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { useHydrated } from "@/lib/use-hydrated";
 
 const DEFAULT_COLORS = ["bg-indigo-400/20", "bg-blue-400/20", "bg-purple-400/20", "bg-emerald-400/20"];
 
@@ -21,30 +22,34 @@ interface FloatingElementsProps {
   colors?: string[];
 }
 
+function pseudoRandom(seed: number) {
+  const value = Math.sin(seed) * 10000;
+  return value - Math.floor(value);
+}
+
 export function FloatingElements({
   className,
   count = 6,
   colors,
 }: FloatingElementsProps) {
-  const [elements, setElements] = useState<FloatingElement[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useHydrated();
 
-  useEffect(() => {
+  const elements = useMemo<FloatingElement[]>(() => {
     const colorArray = colors ?? DEFAULT_COLORS;
-    const generated = Array.from({ length: count }, (_, i) => ({
+    return Array.from({ length: count }, (_, i) => ({
       id: i,
-      size: Math.random() * 60 + 20,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      duration: Math.random() * 10 + 15,
-      delay: Math.random() * 5,
-      color: colorArray[Math.floor(Math.random() * colorArray.length)],
+      size: pseudoRandom(i * 7.17 + count) * 60 + 20,
+      x: pseudoRandom(i * 11.23 + count) * 100,
+      y: pseudoRandom(i * 13.37 + count) * 100,
+      duration: pseudoRandom(i * 17.41 + count) * 10 + 15,
+      delay: pseudoRandom(i * 19.61 + count) * 5,
+      color: colorArray[
+        Math.floor(pseudoRandom(i * 23.17 + count) * colorArray.length)
+      ],
     }));
-    setElements(generated);
-    setMounted(true);
   }, [count, colors]);
 
-  if (!mounted) {
+  if (!isClient) {
     return <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", className)} />;
   }
 
@@ -86,23 +91,20 @@ interface ParticleFieldProps {
 }
 
 export function ParticleField({ className, particleCount = 30 }: ParticleFieldProps) {
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const isClient = useHydrated();
 
-  useEffect(() => {
-    const generated = Array.from({ length: particleCount }, (_, i) => ({
+  const particles = useMemo<Particle[]>(() => {
+    return Array.from({ length: particleCount }, (_, i) => ({
       id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 4 + 1,
-      duration: Math.random() * 20 + 10,
-      delay: Math.random() * 10,
+      x: pseudoRandom(i * 3.31 + particleCount) * 100,
+      y: pseudoRandom(i * 5.29 + particleCount) * 100,
+      size: pseudoRandom(i * 7.07 + particleCount) * 4 + 1,
+      duration: pseudoRandom(i * 9.91 + particleCount) * 20 + 10,
+      delay: pseudoRandom(i * 11.11 + particleCount) * 10,
     }));
-    setParticles(generated);
-    setMounted(true);
   }, [particleCount]);
 
-  if (!mounted) {
+  if (!isClient) {
     return <div className={cn("absolute inset-0 overflow-hidden pointer-events-none", className)} />;
   }
 

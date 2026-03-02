@@ -27,9 +27,23 @@ export interface PremiumPackageUpdateRequest {
 }
 
 export interface PaymentUrlResponse {
-  payment_url: string;
-  order_id: string;
+  url: string;
   amount: number;
+  ref1: string;
+}
+
+export interface PremiumPackagePageResult {
+  content: PremiumPackage[];
+  page: number;
+  size: number;
+  total_elements: number;
+  total_pages: number;
+  is_first: boolean;
+  is_last: boolean;
+  totalElements?: number;
+  totalPages?: number;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export interface PremiumPackageResponse {
@@ -41,21 +55,28 @@ export interface PremiumPackageResponse {
 export interface PremiumPackageListResponse {
   success: boolean;
   message: string;
-  result: {
-    content: PremiumPackage[];
-    page: number;
-    size: number;
-    total_elements: number;
-    total_pages: number;
-    is_first: boolean;
-    is_last: boolean;
-  };
+  result: PremiumPackagePageResult;
 }
 
 export interface PaymentUrlResponseData {
   success: boolean;
   message: string;
   result: PaymentUrlResponse;
+}
+
+export interface PaymentTransactionCheckResult {
+  is_registration_successful: boolean;
+  payment_status: "PENDING" | "SUCCESS" | "PAID" | "COMPLETED" | "FAILED" | string;
+  subscription_plan?: string;
+  subscription_end_at?: string | null;
+  latest_transaction_status?: string | null;
+  latest_transaction_amount?: number;
+}
+
+export interface CheckTransactionResponse {
+  success: boolean;
+  message: string;
+  result?: PaymentTransactionCheckResult | null;
 }
 
 export interface DeleteResponse {
@@ -76,6 +97,16 @@ class PremiumPackageService {
       "/premium-packages",
       params,
     );
+  }
+
+  /**
+   * List active packages from payment endpoint (public flow)
+   */
+  async listActivePackages(params?: {
+    page?: number;
+    size?: number;
+  }): Promise<PremiumPackageListResponse> {
+    return apiClient.get<PremiumPackageListResponse>("/payments/packages", params);
   }
 
   /**
@@ -121,6 +152,34 @@ class PremiumPackageService {
     return apiClient.post<PaymentUrlResponseData>(
       `/payments/subscribe/${packageId}`,
     );
+  }
+
+  /**
+   * Check whether the transfer has been received
+   */
+  async checkTransaction(): Promise<CheckTransactionResponse> {
+    return apiClient.get<CheckTransactionResponse>("/payments/check-transaction");
+  }
+
+  /**
+   * Determine whether transaction check response indicates success.
+   */
+  isTransactionSuccessful(response: CheckTransactionResponse): boolean {
+    const plan = (response.result?.subscription_plan || "").toUpperCase();
+    return !!(
+      response.success &&
+      response.result &&
+      response.result.is_registration_successful === true &&
+      plan === "VIP"
+    );
+  }
+
+  /**
+   * Determine whether transaction is still in processing state.
+   */
+  isTransactionPending(response: CheckTransactionResponse): boolean {
+    if (!response.success || !response.result) return false;
+    return (response.result.payment_status || "").toUpperCase() === "PENDING";
   }
 
   /**

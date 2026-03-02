@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,11 +41,7 @@ export default function AdminUsersPage() {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [page, filterRole, filterStatus]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
       const params: {
@@ -65,7 +61,11 @@ export default function AdminUsersPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filterRole, filterStatus, page]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this user?")) return;
@@ -298,7 +298,7 @@ export default function AdminUsersPage() {
               Subscription Details
             </DialogTitle>
             <DialogDescription>
-              {selectedUser?.profile.display_name}'s subscription information
+              {selectedUser?.profile.display_name}&apos;s subscription information
             </DialogDescription>
           </DialogHeader>
 

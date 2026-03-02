@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,12 +11,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Check, Copy, LogIn, QrCode, RefreshCw, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import {
   premiumPackageService,
+  type PaymentUrlResponse,
   type PremiumPackage,
 } from "@/services/premiumPackageService";
+import { authService } from "@/services/authService";
+import type { ApiError } from "@/services";
+import { toast } from "react-toastify";
+import Image from "next/image";
 
 const DEFAULT_FEATURES = [
   "All languages, always",
@@ -33,22 +47,45 @@ const DEFAULT_FEATURES = [
   "Cultural & language tips",
 ];
 
+interface ParsedPaymentInfo {
+  bank: string;
+  accountNumber: string;
+  amount: string;
+  transferContent: string;
+}
+
 export default function PlansPage() {
+  const router = useRouter();
   const [billingPeriod, setBillingPeriod] = useState<
     "monthly" | "annual" | "lifetime"
   >("monthly");
   const [packages, setPackages] = useState<PremiumPackage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPackage, setSelectedPackage] = useState<PremiumPackage | null>(
+    null,
+  );
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentUrlResponse | null>(
+    null,
+  );
+  const [paymentError, setPaymentError] = useState("");
+  const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
+  const [isCheckingTransaction, setIsCheckingTransaction] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const response = await premiumPackageService.list({ size: 100 });
+        const response = await premiumPackageService
+          .listActivePackages({ size: 100 })
+          .catch(() => premiumPackageService.list({ size: 100 }));
         if (response.success && response.result.content) {
           setPackages(response.result.content);
         }
       } catch (error) {
         console.error("Failed to fetch premium packages:", error);
+        toast.error("Failed to load plans. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -56,6 +93,129 @@ export default function PlansPage() {
 
     fetchPackages();
   }, []);
+
+  const parsePaymentUrlInfo = (
+    payment: PaymentUrlResponse | null,
+  ): ParsedPaymentInfo | null => {
+    if (!payment?.url) return null;
+
+    try {
+      const qrUrl = new URL(payment.url);
+      return {
+        bank: qrUrl.searchParams.get("bank") || "",
+        accountNumber: qrUrl.searchParams.get("acc") || "",
+        amount:
+          qrUrl.searchParams.get("amount") ||
+          String(payment.amount ? Number(payment.amount) : ""),
+        transferContent:
+          qrUrl.searchParams.get("des") || payment.ref1 || "",
+      };
+    } catch {
+      return {
+        bank: "",
+        accountNumber: "",
+        amount: String(payment.amount ? Number(payment.amount) : ""),
+        transferContent: payment.ref1 || "",
+      };
+    }
+  };
+
+  const handleSubscribe = async (pkg: PremiumPackage) => {
+    setSelectedPackage(pkg);
+    setPaymentError("");
+
+    if (!authService.getAccessToken()) {
+      setLoginDialogOpen(true);
+      return;
+    }
+
+    try {
+      setIsGeneratingPayment(true);
+      const response = await premiumPackageService.generatePaymentUrl(pkg.id);
+
+      if (response.success && response.result?.url) {
+        setPaymentDetails(response.result);
+        setPaymentDialogOpen(true);
+        toast.success("Payment QR generated");
+        return;
+      }
+
+      const message = response.message || "Could not generate payment QR.";
+      setPaymentError(message);
+      toast.error(message);
+    } catch (error) {
+      console.error("Failed to generate payment URL:", error);
+      const apiError = error as ApiError;
+      if (apiError.status === 401) {
+        setLoginDialogOpen(true);
+        toast.info("Please sign in to continue subscription.");
+        return;
+      }
+
+      setPaymentError("Could not generate payment QR. Please try again.");
+      toast.error("Could not generate payment QR. Please try again.");
+    } finally {
+      setIsGeneratingPayment(false);
+    }
+  };
+
+  const handleCopy = async (value: string, field: string) => {
+    if (!value) return;
+
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(field);
+      setTimeout(() => setCopiedField(null), 1500);
+      toast.success("Copied to clipboard");
+    } catch (error) {
+      console.error("Copy failed:", error);
+      toast.error("Copy failed");
+    }
+  };
+
+  const handleCheckTransaction = async () => {
+    if (!paymentDetails) return;
+
+    try {
+      setIsCheckingTransaction(true);
+      setPaymentError("");
+      const response = await premiumPackageService.checkTransaction();
+
+      const isSuccessful =
+        premiumPackageService.isTransactionSuccessful(response);
+
+      if (isSuccessful) {
+        toast.success("Subscription activated successfully.", {
+          autoClose: 1800,
+          onClose: () => window.location.reload(),
+        });
+        return;
+      }
+
+      if (premiumPackageService.isTransactionPending(response)) {
+        const pendingMessage =
+          response.message ||
+          "Transaction is being processed. Please check again shortly.";
+        setPaymentError(pendingMessage);
+        toast.info(pendingMessage);
+        return;
+      }
+
+      const message =
+        response.message ||
+        "Transaction is not successful yet. Please verify and try again.";
+      setPaymentError(message);
+      toast.info(message);
+    } catch (error) {
+      console.error("Failed to check transaction:", error);
+      setPaymentError("Cannot verify transaction now. Please try again.");
+      toast.error("Cannot verify transaction now. Please try again.");
+    } finally {
+      setIsCheckingTransaction(false);
+    }
+  };
+
+  const paymentInfo = parsePaymentUrlInfo(paymentDetails);
 
   return (
     <div className="min-h-screen bg-background">
@@ -225,8 +385,14 @@ export default function PlansPage() {
                       )}
                     </div>
 
-                    <Button className="w-full bg-primary hover:bg-primary/90">
-                      Subscribe now
+                    <Button
+                      className="w-full bg-primary hover:bg-primary/90"
+                      onClick={() => handleSubscribe(pkg)}
+                      disabled={isGeneratingPayment && selectedPackage?.id === pkg.id}
+                    >
+                      {isGeneratingPayment && selectedPackage?.id === pkg.id
+                        ? "Generating QR..."
+                        : "Get Subscription"}
                     </Button>
 
                     <div className="space-y-2 sm:space-y-3">
@@ -317,6 +483,202 @@ export default function PlansPage() {
           <p className="text-center text-sm text-muted-foreground mt-12">
             *PRO features are available in most supported languages.
           </p>
+
+          <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
+            <DialogContent className="max-h-[90vh] overflow-y-auto p-0 sm:max-w-4xl">
+              <div className="grid gap-0 md:grid-cols-[320px_1fr]">
+                <div className="bg-linear-to-b from-primary/15 via-background to-cyan-500/10 p-6">
+                  <div className="mb-4 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                    <QrCode className="h-4 w-4" />
+                    QR Payment
+                  </div>
+                  <div className="overflow-hidden rounded-2xl border border-border bg-white p-3 shadow-xl">
+                    {paymentDetails?.url ? (
+                      <Image
+                        src={paymentDetails.url}
+                        alt="Payment QR code"
+                        width={320}
+                        height={320}
+                        className="h-full w-full rounded-xl object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
+                        No QR available
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-5 p-6">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2 text-2xl">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      Subscription Payment
+                    </DialogTitle>
+                    <DialogDescription>
+                      Please transfer with exact amount and content below.
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div className="grid gap-3">
+                    <div className="rounded-lg border border-border bg-background p-3">
+                      <Label>Package</Label>
+                      <p className="mt-1 font-semibold text-foreground">
+                        {selectedPackage?.name || "Premium"}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-border bg-background p-3">
+                      <Label>Bank</Label>
+                      <p className="mt-1 font-semibold text-foreground">
+                        {paymentInfo?.bank || "TPBANK"}
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg border border-border bg-background p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <Label>Account Number</Label>
+                          <p className="mt-1 font-semibold text-foreground">
+                            {paymentInfo?.accountNumber || "07701221901"}
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() =>
+                            handleCopy(
+                              paymentInfo?.accountNumber || "07701221901",
+                              "account",
+                            )
+                          }
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                          {copiedField === "account" ? "Copied" : "Copy"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="rounded-lg border border-border bg-background p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <Label>Amount (VND)</Label>
+                          <p className="mt-1 font-semibold text-foreground">
+                            {Number(
+                              paymentInfo?.amount || paymentDetails?.amount || 0,
+                            ).toLocaleString("vi-VN")}
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() =>
+                            handleCopy(
+                              String(
+                                paymentInfo?.amount || paymentDetails?.amount || 0,
+                              ),
+                              "amount",
+                            )
+                          }
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                          {copiedField === "amount" ? "Copied" : "Copy"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="rounded-lg border border-border bg-background p-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <div>
+                          <Label>Transfer Content</Label>
+                          <p className="mt-1 font-semibold text-foreground">
+                            {paymentInfo?.transferContent || paymentDetails?.ref1}
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1"
+                          onClick={() =>
+                            handleCopy(
+                              paymentInfo?.transferContent ||
+                                paymentDetails?.ref1 ||
+                                "",
+                              "content",
+                            )
+                          }
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                          {copiedField === "content" ? "Copied" : "Copy"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-amber-300/40 bg-amber-50/70 p-4 text-sm text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+                    <p className="mb-2 font-semibold">Important notes:</p>
+                    <ul className="list-disc space-y-1 pl-5">
+                      <li>Please transfer exact amount.</li>
+                      <li>Please use exact transfer content.</li>
+                      <li>Click check transaction after payment.</li>
+                    </ul>
+                  </div>
+
+                  {paymentError && (
+                    <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                      {paymentError}
+                    </p>
+                  )}
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Button
+                      onClick={handleCheckTransaction}
+                      disabled={isCheckingTransaction}
+                      className="gap-2"
+                    >
+                      <RefreshCw
+                        className={`h-4 w-4 ${isCheckingTransaction ? "animate-spin" : ""}`}
+                      />
+                      {isCheckingTransaction
+                        ? "Checking..."
+                        : "Check transaction"}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen}>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <LogIn className="h-5 w-5 text-primary" />
+                  Sign in required
+                </DialogTitle>
+                <DialogDescription>
+                  You need to sign in before creating subscription payment.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setLoginDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    setLoginDialogOpen(false);
+                    router.push("/login?redirect=/plans");
+                  }}
+                >
+                  Go to Login
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

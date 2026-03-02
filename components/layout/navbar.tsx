@@ -7,7 +7,10 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
-import { authService } from "@/services/authService";
+import {
+  authService,
+  AUTH_STATE_CHANGED_EVENT,
+} from "@/services/authService";
 import { userService, type User as AppUser } from "@/services";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { UserProfileDropdown } from "@/components/layout/avtDropdownMenu";
@@ -20,6 +23,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
+import { toast } from "react-toastify";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -38,6 +42,7 @@ export function Navbar() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [profileError, setProfileError] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
   const isFetchingRef = useRef(false);
 
   const fetchAppUser = useCallback(async () => {
@@ -45,6 +50,7 @@ export function Navbar() {
 
     isFetchingRef.current = true;
     try {
+      setIsProfileLoading(true);
       setProfileError(false);
       const response = await userService.getProfile();
       if (response.success) {
@@ -52,11 +58,11 @@ export function Navbar() {
       } else {
         setProfileError(true);
       }
-    } catch (error) {
-      console.error("Failed to fetch user profile from backend:", error);
+    } catch {
       // Mark profile fetch as failed, use Firebase data as fallback
       setProfileError(true);
     } finally {
+      setIsProfileLoading(false);
       isFetchingRef.current = false;
     }
   }, []);
@@ -69,7 +75,8 @@ export function Navbar() {
         // Only fetch if backend is available (check env var or skip for now)
         const shouldFetchBackend =
           process.env.NEXT_PUBLIC_ENABLE_BACKEND !== "false";
-        if (shouldFetchBackend) {
+        const hasAccessToken = !!authService.getAccessToken();
+        if (shouldFetchBackend && hasAccessToken) {
           fetchAppUser();
         } else {
           // Use Firebase user data only
@@ -83,17 +90,66 @@ export function Navbar() {
     return unsubscribe;
   }, [fetchAppUser]);
 
+  useEffect(() => {
+    const syncAuthState = () => {
+      const accessToken = authService.getAccessToken();
+      if (accessToken) {
+        fetchAppUser();
+        if (auth?.currentUser) {
+          setUser(auth.currentUser);
+        }
+        return;
+      }
+
+      setAppUser(null);
+      setProfileError(false);
+      if (!auth?.currentUser) {
+        setUser(null);
+      }
+    };
+
+    syncAuthState();
+    window.addEventListener(AUTH_STATE_CHANGED_EVENT, syncAuthState);
+    return () => {
+      window.removeEventListener(AUTH_STATE_CHANGED_EVENT, syncAuthState);
+    };
+  }, [fetchAppUser]);
+
   const handleGoogleLogin = async () => {
     try {
       setIsAuthLoading(true);
       await authService.signInWithGoogleAndSync();
     } catch (err) {
       console.error("Google sign-in failed", err);
-      window.alert("Google sign-in failed. Please try again.");
+      toast.error("Google sign-in failed. Please try again.");
     } finally {
       setIsAuthLoading(false);
     }
   };
+
+  const dropdownUser: AppUser | null =
+    appUser ||
+    (user && profileError
+      ? {
+          id: user.uid,
+          email: user.email || "",
+          role: "USER" as const,
+          status: "ACTIVE" as const,
+          last_login_at: null,
+          last_active_at: null,
+          sepay_code: null,
+          fcm_token: null,
+          profile: {
+            user_id: user.uid,
+            display_name: user.displayName || user.email?.split("@")[0] || "User",
+            avatar_url: user.photoURL || null,
+            locale: null,
+            timezone: null,
+          },
+          created_at: "",
+          updated_at: "",
+        }
+      : null);
 
   const handleLogoutSuccess = () => {
     // Protected routes that require authentication
@@ -193,17 +249,13 @@ export function Navbar() {
 
               {/* Mobile Auth Section */}
               <div className="mt-8 pt-6 border-t border-border">
-                {user && (appUser || profileError) ? (
+                {dropdownUser ? (
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 px-4">
                       <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
-                        {appUser?.profile?.avatar_url || user.photoURL ? (
+                        {dropdownUser.profile?.avatar_url ? (
                           <Image
-                            src={
-                              appUser?.profile?.avatar_url ||
-                              user.photoURL ||
-                              ""
-                            }
+                            src={dropdownUser.profile.avatar_url}
                             alt="User avatar"
                             width={40}
                             height={40}
@@ -211,21 +263,18 @@ export function Navbar() {
                           />
                         ) : (
                           <span className="text-sm font-medium text-primary">
-                            {appUser?.profile?.display_name?.[0]?.toUpperCase() ||
-                              user.displayName?.[0]?.toUpperCase() ||
-                              user.email?.[0]?.toUpperCase() ||
+                            {dropdownUser.profile?.display_name?.[0]?.toUpperCase() ||
+                              dropdownUser.email?.[0]?.toUpperCase() ||
                               "U"}
                           </span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">
-                          {appUser?.profile?.display_name ||
-                            user.displayName ||
-                            "User"}
+                          {dropdownUser.profile?.display_name || "User"}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {user.email}
+                          {dropdownUser.email}
                         </p>
                       </div>
                     </div>
@@ -248,10 +297,10 @@ export function Navbar() {
                         handleLogoutSuccess();
                       }}
                     >
-                      Đăng xuất
+                      Logout
                     </Button>
                   </div>
-                ) : user && !appUser && !profileError ? (
+                ) : isProfileLoading || (!!authService.getAccessToken() && !appUser) ? (
                   <div className="h-10 rounded-full bg-muted animate-pulse" />
                 ) : (
                   <Button
@@ -292,34 +341,13 @@ export function Navbar() {
 
           {/* Desktop Auth */}
           <div className="hidden md:block">
-            {user && (appUser || profileError) ? (
+            {dropdownUser ? (
               <UserProfileDropdown
-                user={
-                  appUser || {
-                    id: user.uid,
-                    email: user.email || "",
-                    role: "USER" as const,
-                    status: "ACTIVE" as const,
-                    last_login_at: null,
-                    last_active_at: null,
-                    sepay_code: null,
-                    fcm_token: null,
-                    profile: {
-                      user_id: user.uid,
-                      display_name:
-                        user.displayName || user.email?.split("@")[0] || "User",
-                      avatar_url: user.photoURL || null,
-                      locale: null,
-                      timezone: null,
-                    },
-                    created_at: "",
-                    updated_at: "",
-                  }
-                }
-                email={user.email || undefined}
+                user={dropdownUser}
+                email={dropdownUser.email || undefined}
                 onLogoutSuccess={handleLogoutSuccess}
               />
-            ) : user && !appUser && !profileError ? (
+            ) : isProfileLoading || (!!authService.getAccessToken() && !appUser) ? (
               <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
             ) : (
               <Button

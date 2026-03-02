@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,15 +72,7 @@ export default function AdminPaymentsPage() {
     active: true,
   });
 
-  useEffect(() => {
-    fetchPackages();
-  }, [packagesPage]);
-
-  useEffect(() => {
-    fetchPaymentMethods();
-  }, [methodsPage]);
-
-  const fetchPackages = async () => {
+  const fetchPackages = useCallback(async () => {
     try {
       setPackagesLoading(true);
       const response = await premiumPackageService.list({
@@ -94,9 +86,9 @@ export default function AdminPaymentsPage() {
     } finally {
       setPackagesLoading(false);
     }
-  };
+  }, [packagesPage]);
 
-  const fetchPaymentMethods = async () => {
+  const fetchPaymentMethods = useCallback(async () => {
     try {
       setMethodsLoading(true);
       const response = await paymentMethodService.list({
@@ -110,7 +102,15 @@ export default function AdminPaymentsPage() {
     } finally {
       setMethodsLoading(false);
     }
-  };
+  }, [methodsPage]);
+
+  useEffect(() => {
+    fetchPackages();
+  }, [fetchPackages]);
+
+  useEffect(() => {
+    fetchPaymentMethods();
+  }, [fetchPaymentMethods]);
 
   const handleDeletePackage = async (id: number) => {
     if (!confirm("Are you sure you want to delete this package?")) return;

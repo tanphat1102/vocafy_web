@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -10,37 +10,43 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { authService } from "@/services";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const handleCredentialSignIn = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    toast.info("Email/password login is coming soon. Please use Google sign-in.");
+  };
 
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
       setError("");
-      const result = await authService.signInWithGoogleAndSync();
-      console.log("Sign in successful, tokens saved:", {
-        hasAccessToken: !!result.accessToken,
-        hasRefreshToken: !!result.refreshToken,
-      });
+      await authService.signInWithGoogleAndSync();
 
       // Get role and redirect accordingly
       const role = authService.getUserRole();
-      console.log("User role:", role);
 
-      if (role === "ADMIN") {
-        router.push("/admin");
-      } else if (role === "MANAGER") {
-        router.push("/manager");
-      } else {
-        router.push("/");
-      }
+      const redirectPath = searchParams.get("redirect");
+      const safeRedirectPath =
+        redirectPath && redirectPath.startsWith("/") ? redirectPath : null;
+      const targetPath =
+        safeRedirectPath ||
+        (role === "ADMIN" ? "/admin" : role === "MANAGER" ? "/manager" : "/");
+
+      router.push(targetPath);
+      router.refresh();
+      toast.success("Login successful");
     } catch (error) {
       console.error("Google sign in error:", error);
       setError("Failed to sign in with Google. Please try again.");
+      toast.error("Failed to sign in with Google. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +85,7 @@ export default function LoginPage() {
           )}
 
           {/* Login Form */}
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleCredentialSignIn}>
             {/* Email Field */}
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground font-medium">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LucideIcon } from "lucide-react";
 import { userService, type User as UserType } from "@/services";
+import { authService } from "@/services/authService";
 import { usePathname } from "next/navigation";
 import { UnifiedNavbar } from "@/components/layout/unified-navbar";
 
@@ -30,14 +31,14 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const fetchUserProfile = async () => {
+      if (!authService.getAccessToken()) return;
       try {
         const response = await userService.getProfile();
-        console.log("Dashboard layout - user profile response:", response);
         if (response.success) {
           setUser(response.result);
         }
-      } catch (error) {
-        console.error("Failed to fetch user profile:", error);
+      } catch {
+        // Keep UI usable even when profile API is unavailable.
       }
     };
 

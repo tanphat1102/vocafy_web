@@ -1,8 +1,5 @@
-import { AUTH_ACCESS_TOKEN_STORAGE_KEY } from "./authService";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BACKEND_URL ||
-  "https://vocafy.milize-lena.space/api";
+import { getStoredAccessToken } from "@/lib/auth-storage";
+import { API_BASE_URL } from "./config";
 
 type QueryParams = Record<string, string | number | boolean | undefined | null>;
 
@@ -23,15 +20,38 @@ class ApiClient {
       "Content-Type": "application/json",
     };
 
-    // Get access token from localStorage if available
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem(AUTH_ACCESS_TOKEN_STORAGE_KEY);
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
+    const token = getStoredAccessToken();
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
     }
 
     return headers;
+  }
+
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit,
+    params?: QueryParams,
+  ): Promise<T> {
+    const url = new URL(`${this.baseURL}${endpoint}`);
+
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          url.searchParams.append(key, String(value));
+        }
+      });
+    }
+
+    const response = await fetch(url.toString(), {
+      ...options,
+      headers: {
+        ...this.getAuthHeaders(),
+        ...options.headers,
+      },
+    });
+
+    return this.handleResponse<T>(response);
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
@@ -60,61 +80,40 @@ class ApiClient {
   }
 
   async get<T>(endpoint: string, params?: QueryParams): Promise<T> {
-    const url = new URL(`${this.baseURL}${endpoint}`);
-
-    if (params) {
-      Object.keys(params).forEach((key) => {
-        if (params[key] !== undefined && params[key] !== null) {
-          url.searchParams.append(key, String(params[key]));
-        }
-      });
-    }
-
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: this.getAuthHeaders(),
-    });
-
-    return this.handleResponse<T>(response);
+    return this.request<T>(
+      endpoint,
+      {
+        method: "GET",
+      },
+      params,
+    );
   }
 
   async post<T>(endpoint: string, body?: unknown): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+    return this.request<T>(endpoint, {
       method: "POST",
-      headers: this.getAuthHeaders(),
       body: body ? JSON.stringify(body) : undefined,
     });
-
-    return this.handleResponse<T>(response);
   }
 
   async put<T>(endpoint: string, body?: unknown): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+    return this.request<T>(endpoint, {
       method: "PUT",
-      headers: this.getAuthHeaders(),
       body: body ? JSON.stringify(body) : undefined,
     });
-
-    return this.handleResponse<T>(response);
   }
 
   async delete<T>(endpoint: string): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+    return this.request<T>(endpoint, {
       method: "DELETE",
-      headers: this.getAuthHeaders(),
     });
-
-    return this.handleResponse<T>(response);
   }
 
   async patch<T>(endpoint: string, body?: unknown): Promise<T> {
-    const response = await fetch(`${this.baseURL}${endpoint}`, {
+    return this.request<T>(endpoint, {
       method: "PATCH",
-      headers: this.getAuthHeaders(),
       body: body ? JSON.stringify(body) : undefined,
     });
-
-    return this.handleResponse<T>(response);
   }
 }
 
