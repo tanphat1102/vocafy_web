@@ -1,72 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { AUTH_ACCESS_TOKEN_STORAGE_KEY } from "@/lib/auth-constants";
+import { getUserRoleFromToken } from "@/lib/jwt";
 
-interface DecodedToken {
-  sub: string;
-  email?: string;
-  role?: string;
-  roles?: string[];
-  exp?: number;
-  iat?: number;
-  [key: string]: unknown;
-}
-
-function decodeToken(token: string): DecodedToken | null {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) {
-      return null;
-    }
-
-    const payload = parts[1];
-    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const padding = base64.length % 4;
-    const padded = padding ? base64 + "=".repeat(4 - padding) : base64;
-
-    // In Node.js environment, use Buffer instead of atob
-    const decoded = Buffer.from(padded, "base64").toString("utf-8");
-    return JSON.parse(decoded) as DecodedToken;
-  } catch (error) {
-    console.error("Failed to decode token:", error);
-    return null;
-  }
-}
-
-function getUserRole(token: string): string | null {
-  const decoded = decodeToken(token);
-  if (!decoded) {
-    return null;
-  }
-
-  if (decoded.role) {
-    return decoded.role;
-  }
-
-  if (
-    decoded.roles &&
-    Array.isArray(decoded.roles) &&
-    decoded.roles.length > 0
-  ) {
-    return decoded.roles[0];
-  }
-
-  return null;
-}
-
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Get access token from cookies or local storage (we'll use cookies for server-side)
-  const accessToken = request.cookies.get("vocafy:accessToken")?.value;
-
-  // Public routes that don't require authentication
-  const publicRoutes = [
-    "/login",
-    "/register",
-    "/",
-    "/contact",
-    "/introduction",
-  ];
+  const accessToken = request.cookies.get(AUTH_ACCESS_TOKEN_STORAGE_KEY)?.value;
 
   // Static files and API routes
   if (
@@ -91,7 +31,7 @@ export function middleware(request: NextRequest) {
 
   // Check role-based access
   if (accessToken) {
-    const role = getUserRole(accessToken);
+    const role = getUserRoleFromToken(accessToken);
 
     // Admin routes - only ADMIN can access
     if (isAdminRoute && role !== "ADMIN") {

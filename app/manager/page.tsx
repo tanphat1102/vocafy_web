@@ -12,8 +12,6 @@ import { BookOpen, Library, Languages, TrendingUp } from "lucide-react";
 import {
   BarChart,
   Bar,
-  LineChart,
-  Line,
   AreaChart,
   Area,
   XAxis,
