@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { authService } from "@/services";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +21,9 @@ export default function LoginPage() {
 
   const handleCredentialSignIn = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    toast.info("Email/password login is coming soon. Please use Google sign-in.");
+    toast.info(
+      "Email/password login is coming soon. Please use Google sign-in.",
+    );
   };
 
   const handleGoogleSignIn = async () => {
@@ -42,10 +44,8 @@ export default function LoginPage() {
 
       router.push(targetPath);
       router.refresh();
-      toast.success("Login successful");
     } catch (error) {
       console.error("Google sign in error:", error);
-      setError("Failed to sign in with Google. Please try again.");
       toast.error("Failed to sign in with Google. Please try again.");
     } finally {
       setIsLoading(false);
@@ -76,13 +76,6 @@ export default function LoginPage() {
               Enter your credentials to access your account
             </p>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-              <p className="text-sm text-destructive">{error}</p>
-            </div>
-          )}
 
           {/* Login Form */}
           <form className="space-y-5" onSubmit={handleCredentialSignIn}>

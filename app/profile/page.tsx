@@ -35,7 +35,7 @@ import Image from "next/image";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { CloudinaryUpload } from "@/components/ui/cloudinary-upload";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import {
   userService,
   subscriptionService,
@@ -74,10 +74,8 @@ export default function ProfilePage() {
     null,
   );
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState<PaymentUrlResponse | null>(
-    null,
-  );
-  const [paymentError, setPaymentError] = useState("");
+  const [paymentDetails, setPaymentDetails] =
+    useState<PaymentUrlResponse | null>(null);
   const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
   const [isCheckingTransaction, setIsCheckingTransaction] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -126,7 +124,6 @@ export default function ProfilePage() {
   const fetchPaymentPackages = async () => {
     try {
       setPackagesLoading(true);
-      setPaymentError("");
 
       const response = await premiumPackageService
         .listActivePackages({ page: 0, size: 10 })
@@ -144,7 +141,7 @@ export default function ProfilePage() {
       });
     } catch (error) {
       console.error("Failed to fetch payment packages:", error);
-      setPaymentError("Cannot load upgrade packages right now.");
+      toast.error("Cannot load upgrade packages right now.");
     } finally {
       setPackagesLoading(false);
     }
@@ -163,8 +160,7 @@ export default function ProfilePage() {
         amount:
           qrUrl.searchParams.get("amount") ||
           String(payment.amount ? Number(payment.amount) : ""),
-        transferContent:
-          qrUrl.searchParams.get("des") || payment.ref1 || "",
+        transferContent: qrUrl.searchParams.get("des") || payment.ref1 || "",
       };
     } catch {
       return {
@@ -178,16 +174,14 @@ export default function ProfilePage() {
 
   const handleCreatePayment = async () => {
     if (!selectedPackageId) {
-      setPaymentError("Please select a package before payment.");
+      toast.error("Please select a package before payment.");
       return;
     }
 
     try {
       setIsGeneratingPayment(true);
-      setPaymentError("");
-      const response = await premiumPackageService.generatePaymentUrl(
-        selectedPackageId,
-      );
+      const response =
+        await premiumPackageService.generatePaymentUrl(selectedPackageId);
 
       if (response.success && response.result?.url) {
         setPaymentDetails(response.result);
@@ -195,10 +189,10 @@ export default function ProfilePage() {
         return;
       }
 
-      setPaymentError(response.message || "Could not generate payment QR.");
+      toast.error(response.message || "Could not generate payment QR.");
     } catch (error) {
       console.error("Failed to create payment:", error);
-      setPaymentError("Could not generate payment QR. Please try again.");
+      toast.error("Could not generate payment QR. Please try again.");
     } finally {
       setIsGeneratingPayment(false);
     }
@@ -211,6 +205,7 @@ export default function ProfilePage() {
       await navigator.clipboard.writeText(value);
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 1500);
+      toast.success("Copied to clipboard");
     } catch (error) {
       console.error("Copy failed:", error);
     }
@@ -221,14 +216,13 @@ export default function ProfilePage() {
 
     try {
       setIsCheckingTransaction(true);
-      setPaymentError("");
       const response = await premiumPackageService.checkTransaction();
 
       if (premiumPackageService.isTransactionSuccessful(response)) {
-        toast.success("Payment successful. The page will reload shortly.", {
-          autoClose: 1800,
-          onClose: () => window.location.reload(),
-        });
+        toast.success("Payment successful! The page will reload shortly.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1800);
         return;
       }
 
@@ -236,18 +230,17 @@ export default function ProfilePage() {
         const pendingMessage =
           response.message ||
           "Transaction is being processed. Please check again shortly.";
-        setPaymentError(pendingMessage);
-        toast.info(pendingMessage);
+        toast.warning(pendingMessage);
         return;
       }
 
-      setPaymentError(
+      toast.error(
         response.message ||
           "Transaction is not successful yet. Please verify and try again.",
       );
     } catch (error) {
       console.error("Failed to check transaction:", error);
-      setPaymentError("Cannot verify transaction right now. Please try again.");
+      toast.error("Cannot verify transaction right now. Please try again.");
     } finally {
       setIsCheckingTransaction(false);
     }
@@ -530,91 +523,93 @@ export default function ProfilePage() {
             </Card>
           )}
 
-          {/* Upgrade / Payment */}
-          <Card className="relative overflow-hidden border-primary/30 bg-linear-to-br from-primary/10 via-background to-cyan-500/10 shadow-xl">
-            <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary/30 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-16 -left-8 h-40 w-40 rounded-full bg-cyan-400/30 blur-3xl" />
-            <CardHeader className="relative">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Get Plus
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Upgrade your account and pay by QR in seconds.
-              </p>
-            </CardHeader>
-            <CardContent className="relative space-y-4">
-              <div className="grid gap-3 sm:grid-cols-2">
-                {packagesLoading ? (
-                  <>
-                    <div className="h-24 animate-pulse rounded-xl bg-muted" />
-                    <div className="h-24 animate-pulse rounded-xl bg-muted" />
-                  </>
-                ) : packages.length > 0 ? (
-                  packages.map((pkg) => {
-                    const isSelected = selectedPackageId === pkg.id;
-                    return (
-                      <button
-                        key={pkg.id}
-                        onClick={() => setSelectedPackageId(pkg.id)}
-                        className={`rounded-xl border p-4 text-left transition-all duration-300 ${
-                          isSelected
-                            ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
-                            : "border-border bg-background/80 hover:border-primary/50 hover:-translate-y-0.5"
-                        }`}
-                        type="button"
-                      >
-                        <div className="mb-1 flex items-center justify-between">
-                          <p className="font-semibold text-foreground">{pkg.name}</p>
-                          {isSelected && (
-                            <Badge className="bg-primary text-primary-foreground">
-                              Selected
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {pkg.description || "Premium package"}
-                        </p>
-                        <p className="mt-3 text-lg font-bold text-foreground">
-                          {Math.round(pkg.price).toLocaleString("en-US")} VND
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Valid for {pkg.duration_days} days
-                        </p>
-                      </button>
-                    );
-                  })
-                ) : (
-                  <div className="sm:col-span-2 rounded-xl border border-amber-300/40 bg-amber-50/60 p-4 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
-                    There are currently no payment packages. Please contact
-                    support for assistance.
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <Button
-                  onClick={handleCreatePayment}
-                  className="gap-2 bg-linear-to-r from-primary to-cyan-500 px-6 text-white shadow-lg transition-transform hover:scale-[1.02]"
-                  disabled={
-                    packagesLoading || !selectedPackageId || isGeneratingPayment
-                  }
-                >
-                  <QrCode className="h-4 w-4" />
-                  {isGeneratingPayment ? "Generating QR..." : "Get Plus"}
-                </Button>
-                <p className="text-xs text-muted-foreground">
-                  After generating QR, transfer with exact amount and content.
+          {/* Upgrade / Payment - Only show if user doesn't have active premium */}
+          {(!subscription ||
+            subscription.plan === "FREE" ||
+            new Date(subscription.end_at) < new Date()) && (
+            <Card className="relative overflow-hidden border-primary/30 bg-linear-to-br from-primary/10 via-background to-cyan-500/10 shadow-xl">
+              <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary/30 blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-16 -left-8 h-40 w-40 rounded-full bg-cyan-400/30 blur-3xl" />
+              <CardHeader className="relative">
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Get Plus
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Upgrade your account and pay by QR in seconds.
                 </p>
-              </div>
+              </CardHeader>
+              <CardContent className="relative space-y-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {packagesLoading ? (
+                    <>
+                      <div className="h-24 animate-pulse rounded-xl bg-muted" />
+                      <div className="h-24 animate-pulse rounded-xl bg-muted" />
+                    </>
+                  ) : packages.length > 0 ? (
+                    packages.map((pkg) => {
+                      const isSelected = selectedPackageId === pkg.id;
+                      return (
+                        <button
+                          key={pkg.id}
+                          onClick={() => setSelectedPackageId(pkg.id)}
+                          className={`rounded-xl border p-4 text-left transition-all duration-300 ${
+                            isSelected
+                              ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
+                              : "border-border bg-background/80 hover:border-primary/50 hover:-translate-y-0.5"
+                          }`}
+                          type="button"
+                        >
+                          <div className="mb-1 flex items-center justify-between">
+                            <p className="font-semibold text-foreground">
+                              {pkg.name}
+                            </p>
+                            {isSelected && (
+                              <Badge className="bg-primary text-primary-foreground">
+                                Selected
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {pkg.description || "Premium package"}
+                          </p>
+                          <p className="mt-3 text-lg font-bold text-foreground">
+                            {Math.round(pkg.price).toLocaleString("en-US")} VND
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Valid for {pkg.duration_days} days
+                          </p>
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <div className="sm:col-span-2 rounded-xl border border-amber-300/40 bg-amber-50/60 p-4 text-sm text-amber-800 dark:bg-amber-900/30 dark:text-amber-200">
+                      There are currently no payment packages. Please contact
+                      support for assistance.
+                    </div>
+                  )}
+                </div>
 
-              {paymentError && (
-                <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                  {paymentError}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button
+                    onClick={handleCreatePayment}
+                    className="gap-2 bg-linear-to-r from-primary to-cyan-500 px-6 text-white shadow-lg transition-transform hover:scale-[1.02]"
+                    disabled={
+                      packagesLoading ||
+                      !selectedPackageId ||
+                      isGeneratingPayment
+                    }
+                  >
+                    <QrCode className="h-4 w-4" />
+                    {isGeneratingPayment ? "Generating QR..." : "Get Plus"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    After generating QR, transfer with exact amount and content.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
             <DialogContent className="max-h-[90vh] overflow-y-auto p-0 sm:max-w-4xl">
@@ -634,7 +629,7 @@ export default function ProfilePage() {
                         className="h-full w-full rounded-xl object-cover"
                       />
                     ) : (
-                      <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
+                      <div className="flex h-65 items-center justify-center text-sm text-muted-foreground">
                         No QR available
                       </div>
                     )}
@@ -707,7 +702,9 @@ export default function ProfilePage() {
                           <Label>Amount (VND)</Label>
                           <p className="mt-1 font-semibold text-foreground">
                             {Number(
-                              paymentInfo?.amount || paymentDetails?.amount || 0,
+                              paymentInfo?.amount ||
+                                paymentDetails?.amount ||
+                                0,
                             ).toLocaleString("en-US")}
                           </p>
                         </div>
@@ -718,7 +715,9 @@ export default function ProfilePage() {
                           onClick={() =>
                             handleCopy(
                               String(
-                                paymentInfo?.amount || paymentDetails?.amount || 0,
+                                paymentInfo?.amount ||
+                                  paymentDetails?.amount ||
+                                  0,
                               ),
                               "amount",
                             )
@@ -735,7 +734,8 @@ export default function ProfilePage() {
                         <div>
                           <Label>Transfer content</Label>
                           <p className="mt-1 font-semibold text-foreground">
-                            {paymentInfo?.transferContent || paymentDetails?.ref1}
+                            {paymentInfo?.transferContent ||
+                              paymentDetails?.ref1}
                           </p>
                         </div>
                         <Button
@@ -762,7 +762,9 @@ export default function ProfilePage() {
                     <p className="mb-2 font-semibold">Important notes:</p>
                     <ul className="list-disc space-y-1 pl-5">
                       <li>Please transfer the exact displayed amount.</li>
-                      <li>Please use the exact transfer content for matching.</li>
+                      <li>
+                        Please use the exact transfer content for matching.
+                      </li>
                       <li>
                         After transferring, click &#34;Check transaction&#34;.
                       </li>

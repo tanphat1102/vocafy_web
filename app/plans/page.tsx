@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Check, Copy, LogIn, QrCode, RefreshCw, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
+import { toast } from "sonner";
 import {
   premiumPackageService,
   type PaymentUrlResponse,
@@ -28,7 +29,6 @@ import {
 } from "@/services/premiumPackageService";
 import { authService } from "@/services/authService";
 import type { ApiError } from "@/services";
-import { toast } from "react-toastify";
 import Image from "next/image";
 
 const DEFAULT_FEATURES = [
@@ -66,10 +66,8 @@ export default function PlansPage() {
   );
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState<PaymentUrlResponse | null>(
-    null,
-  );
-  const [paymentError, setPaymentError] = useState("");
+  const [paymentDetails, setPaymentDetails] =
+    useState<PaymentUrlResponse | null>(null);
   const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
   const [isCheckingTransaction, setIsCheckingTransaction] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -107,8 +105,7 @@ export default function PlansPage() {
         amount:
           qrUrl.searchParams.get("amount") ||
           String(payment.amount ? Number(payment.amount) : ""),
-        transferContent:
-          qrUrl.searchParams.get("des") || payment.ref1 || "",
+        transferContent: qrUrl.searchParams.get("des") || payment.ref1 || "",
       };
     } catch {
       return {
@@ -122,7 +119,6 @@ export default function PlansPage() {
 
   const handleSubscribe = async (pkg: PremiumPackage) => {
     setSelectedPackage(pkg);
-    setPaymentError("");
 
     if (!authService.getAccessToken()) {
       setLoginDialogOpen(true);
@@ -136,24 +132,22 @@ export default function PlansPage() {
       if (response.success && response.result?.url) {
         setPaymentDetails(response.result);
         setPaymentDialogOpen(true);
-        toast.success("Payment QR generated");
         return;
       }
 
       const message = response.message || "Could not generate payment QR.";
-      setPaymentError(message);
       toast.error(message);
     } catch (error) {
       console.error("Failed to generate payment URL:", error);
       const apiError = error as ApiError;
       if (apiError.status === 401) {
         setLoginDialogOpen(true);
-        toast.info("Please sign in to continue subscription.");
         return;
       }
 
-      setPaymentError("Could not generate payment QR. Please try again.");
-      toast.error("Could not generate payment QR. Please try again.");
+      const errorMessage =
+        apiError.message || "Could not generate payment QR. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsGeneratingPayment(false);
     }
@@ -178,17 +172,18 @@ export default function PlansPage() {
 
     try {
       setIsCheckingTransaction(true);
-      setPaymentError("");
       const response = await premiumPackageService.checkTransaction();
 
       const isSuccessful =
         premiumPackageService.isTransactionSuccessful(response);
 
       if (isSuccessful) {
-        toast.success("Subscription activated successfully.", {
-          autoClose: 1800,
-          onClose: () => window.location.reload(),
-        });
+        toast.success(
+          "Subscription activated successfully. The page will reload shortly.",
+        );
+        setTimeout(() => {
+          window.location.reload();
+        }, 1800);
         return;
       }
 
@@ -196,19 +191,16 @@ export default function PlansPage() {
         const pendingMessage =
           response.message ||
           "Transaction is being processed. Please check again shortly.";
-        setPaymentError(pendingMessage);
-        toast.info(pendingMessage);
+        toast.warning(pendingMessage);
         return;
       }
 
       const message =
         response.message ||
         "Transaction is not successful yet. Please verify and try again.";
-      setPaymentError(message);
-      toast.info(message);
+      toast.error(message);
     } catch (error) {
       console.error("Failed to check transaction:", error);
-      setPaymentError("Cannot verify transaction now. Please try again.");
       toast.error("Cannot verify transaction now. Please try again.");
     } finally {
       setIsCheckingTransaction(false);
@@ -388,7 +380,9 @@ export default function PlansPage() {
                     <Button
                       className="w-full bg-primary hover:bg-primary/90"
                       onClick={() => handleSubscribe(pkg)}
-                      disabled={isGeneratingPayment && selectedPackage?.id === pkg.id}
+                      disabled={
+                        isGeneratingPayment && selectedPackage?.id === pkg.id
+                      }
                     >
                       {isGeneratingPayment && selectedPackage?.id === pkg.id
                         ? "Generating QR..."
@@ -502,7 +496,7 @@ export default function PlansPage() {
                         className="h-full w-full rounded-xl object-cover"
                       />
                     ) : (
-                      <div className="flex h-[260px] items-center justify-center text-sm text-muted-foreground">
+                      <div className="flex h-65 items-center justify-center text-sm text-muted-foreground">
                         No QR available
                       </div>
                     )}
@@ -565,7 +559,9 @@ export default function PlansPage() {
                           <Label>Amount (VND)</Label>
                           <p className="mt-1 font-semibold text-foreground">
                             {Number(
-                              paymentInfo?.amount || paymentDetails?.amount || 0,
+                              paymentInfo?.amount ||
+                                paymentDetails?.amount ||
+                                0,
                             ).toLocaleString("vi-VN")}
                           </p>
                         </div>
@@ -576,7 +572,9 @@ export default function PlansPage() {
                           onClick={() =>
                             handleCopy(
                               String(
-                                paymentInfo?.amount || paymentDetails?.amount || 0,
+                                paymentInfo?.amount ||
+                                  paymentDetails?.amount ||
+                                  0,
                               ),
                               "amount",
                             )
@@ -593,7 +591,8 @@ export default function PlansPage() {
                         <div>
                           <Label>Transfer Content</Label>
                           <p className="mt-1 font-semibold text-foreground">
-                            {paymentInfo?.transferContent || paymentDetails?.ref1}
+                            {paymentInfo?.transferContent ||
+                              paymentDetails?.ref1}
                           </p>
                         </div>
                         <Button
@@ -624,12 +623,6 @@ export default function PlansPage() {
                       <li>Click check transaction after payment.</li>
                     </ul>
                   </div>
-
-                  {paymentError && (
-                    <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                      {paymentError}
-                    </p>
-                  )}
 
                   <div className="flex flex-wrap items-center gap-3">
                     <Button
