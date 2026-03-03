@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Edit, Trash2, DollarSign, CreditCard } from "lucide-react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -81,8 +82,9 @@ export default function AdminPaymentsPage() {
       });
       setPackages(response.result.content);
       setPackagesTotalPages(response.result.total_pages);
-    } catch (error) {
-      console.error("Failed to fetch packages:", error);
+    } catch (err) {
+      console.error("Failed to fetch packages:", err);
+      toast.error((err as Error).message || "Failed to load packages");
     } finally {
       setPackagesLoading(false);
     }
@@ -97,8 +99,9 @@ export default function AdminPaymentsPage() {
       });
       setPaymentMethods(response.result.content);
       setMethodsTotalPages(response.result.total_pages);
-    } catch (error) {
-      console.error("Failed to fetch payment methods:", error);
+    } catch (err) {
+      console.error("Failed to fetch payment methods:", err);
+      toast.error((err as Error).message || "Failed to load payment methods");
     } finally {
       setMethodsLoading(false);
     }
@@ -117,9 +120,10 @@ export default function AdminPaymentsPage() {
     try {
       await premiumPackageService.delete(id);
       fetchPackages();
-    } catch (error) {
-      console.error("Failed to delete package:", error);
-      alert("Failed to delete package");
+      toast.success("Package deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete package:", err);
+      toast.error((err as Error).message || "Failed to delete package");
     }
   };
 
@@ -155,9 +159,10 @@ export default function AdminPaymentsPage() {
       }
       setPackageDialogOpen(false);
       fetchPackages();
-    } catch (error) {
-      console.error("Failed to save package:", error);
-      alert("Failed to save package");
+      toast.success("Package saved successfully");
+    } catch (err) {
+      console.error("Failed to save package:", err);
+      toast.error((err as Error).message || "Failed to save package");
     }
   };
 
@@ -165,9 +170,10 @@ export default function AdminPaymentsPage() {
     try {
       await paymentMethodService.toggleActive(id, { active: !active });
       fetchPaymentMethods();
-    } catch (error) {
-      console.error("Failed to toggle payment method:", error);
-      alert("Failed to toggle payment method");
+      toast.success("Payment method updated successfully");
+    } catch (err) {
+      console.error("Failed to toggle payment method:", err);
+      toast.error((err as Error).message || "Failed to toggle payment method");
     }
   };
 
@@ -199,9 +205,10 @@ export default function AdminPaymentsPage() {
       }
       setMethodDialogOpen(false);
       fetchPaymentMethods();
-    } catch (error) {
-      console.error("Failed to save payment method:", error);
-      alert("Failed to save payment method");
+      toast.success("Payment method saved successfully");
+    } catch (err) {
+      console.error("Failed to save payment method:", err);
+      toast.error((err as Error).message || "Failed to save payment method");
     }
   };
 

@@ -32,6 +32,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Search, Eye, Volume2 } from "lucide-react";
 import { vocabularyService, type Vocabulary } from "@/services";
+import { toast } from "sonner";
 
 type DialogMode = "create" | "edit" | "view" | null;
 
@@ -62,8 +63,9 @@ export default function AdminVocabulariesPage() {
       const response = await vocabularyService.list({ page, size: 10 });
       setVocabularies(response.result.content);
       setTotalPages(response.result.total_pages);
-    } catch (error) {
-      console.error("Failed to fetch vocabularies:", error);
+    } catch (err) {
+      console.error("Failed to fetch vocabularies:", err);
+      toast.error((err as Error).message || "Failed to load vocabularies");
     } finally {
       setIsLoading(false);
     }
@@ -146,9 +148,10 @@ export default function AdminVocabulariesPage() {
       }
       closeDialog();
       fetchVocabularies();
-    } catch (error) {
-      console.error("Failed to save vocabulary:", error);
-      alert("Failed to save vocabulary");
+      toast.success("Vocabulary saved successfully");
+    } catch (err) {
+      console.error("Failed to save vocabulary:", err);
+      toast.error((err as Error).message || "Failed to save vocabulary");
     }
   };
 
@@ -158,9 +161,10 @@ export default function AdminVocabulariesPage() {
     try {
       await vocabularyService.delete(id);
       fetchVocabularies();
-    } catch (error) {
-      console.error("Failed to delete vocabulary:", error);
-      alert("Failed to delete vocabulary");
+      toast.success("Vocabulary deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete vocabulary:", err);
+      toast.error((err as Error).message || "Failed to delete vocabulary");
     }
   };
 

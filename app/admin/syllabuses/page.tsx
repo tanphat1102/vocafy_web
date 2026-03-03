@@ -32,6 +32,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Search, Eye } from "lucide-react";
 import { syllabusService, type Syllabus } from "@/services";
+import { toast } from "sonner";
 
 type DialogMode = "create" | "edit" | "view" | null;
 
@@ -60,8 +61,9 @@ export default function AdminSyllabusesPage() {
       const response = await syllabusService.list({ page, size: 10 });
       setSyllabuses(response.result.content);
       setTotalPages(response.result.total_pages);
-    } catch (error) {
-      console.error("Failed to fetch syllabuses:", error);
+    } catch (err) {
+      console.error("Failed to fetch syllabuses:", err);
+      toast.error((err as Error).message || "Failed to load syllabuses");
     } finally {
       setIsLoading(false);
     }
@@ -115,9 +117,10 @@ export default function AdminSyllabusesPage() {
       }
       closeDialog();
       fetchSyllabuses();
-    } catch (error) {
-      console.error("Failed to save syllabus:", error);
-      alert("Failed to save syllabus");
+      toast.success("Syllabus saved successfully");
+    } catch (err) {
+      console.error("Failed to save syllabus:", err);
+      toast.error((err as Error).message || "Failed to save syllabus");
     }
   };
 
@@ -127,9 +130,10 @@ export default function AdminSyllabusesPage() {
     try {
       await syllabusService.delete(id);
       fetchSyllabuses();
-    } catch (error) {
-      console.error("Failed to delete syllabus:", error);
-      alert("Failed to delete syllabus");
+      toast.success("Syllabus deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete syllabus:", err);
+      toast.error((err as Error).message || "Failed to delete syllabus");
     }
   };
 

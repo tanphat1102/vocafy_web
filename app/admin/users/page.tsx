@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Edit, Trash2, Search, Crown, Calendar, Clock } from "lucide-react";
+import { toast } from "sonner";
 import {
   userService,
   subscriptionService,
@@ -56,8 +57,9 @@ export default function AdminUsersPage() {
       const response = await userService.list(params);
       setUsers(response.result.content);
       setTotalPages(response.result.total_pages);
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+      toast.error((err as Error).message || "Failed to load users");
     } finally {
       setIsLoading(false);
     }
@@ -73,9 +75,10 @@ export default function AdminUsersPage() {
     try {
       await userService.delete(id);
       fetchUsers();
-    } catch (error) {
-      console.error("Failed to delete user:", error);
-      alert("Failed to delete user");
+      toast.success("User deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+      toast.error((err as Error).message || "Failed to delete user");
     }
   };
 
@@ -85,9 +88,10 @@ export default function AdminUsersPage() {
     try {
       const data = await subscriptionService.getSubscriptionByUserId(user.id);
       setSubscription(data);
-    } catch (error) {
-      console.error("Failed to fetch subscription:", error);
+    } catch (err) {
+      console.error("Failed to fetch subscription:", err);
       setSubscription(null);
+      toast.error((err as Error).message || "Failed to load subscription");
     }
   };
 
@@ -298,7 +302,8 @@ export default function AdminUsersPage() {
               Subscription Details
             </DialogTitle>
             <DialogDescription>
-              {selectedUser?.profile.display_name}&apos;s subscription information
+              {selectedUser?.profile.display_name}&apos;s subscription
+              information
             </DialogDescription>
           </DialogHeader>
 
