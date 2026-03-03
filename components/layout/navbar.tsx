@@ -7,10 +7,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { auth, isFirebaseConfigured } from "@/lib/firebase";
-import {
-  authService,
-  AUTH_STATE_CHANGED_EVENT,
-} from "@/services/authService";
+import { authService, AUTH_STATE_CHANGED_EVENT } from "@/services/authService";
 import { userService, type User as AppUser } from "@/services";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { UserProfileDropdown } from "@/components/layout/avtDropdownMenu";
@@ -23,7 +20,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import { toast } from "react-toastify";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -121,7 +117,6 @@ export function Navbar() {
       await authService.signInWithGoogleAndSync();
     } catch (err) {
       console.error("Google sign-in failed", err);
-      toast.error("Google sign-in failed. Please try again.");
     } finally {
       setIsAuthLoading(false);
     }
@@ -141,7 +136,8 @@ export function Navbar() {
           fcm_token: null,
           profile: {
             user_id: user.uid,
-            display_name: user.displayName || user.email?.split("@")[0] || "User",
+            display_name:
+              user.displayName || user.email?.split("@")[0] || "User",
             avatar_url: user.photoURL || null,
             locale: null,
             timezone: null,
@@ -300,7 +296,8 @@ export function Navbar() {
                       Logout
                     </Button>
                   </div>
-                ) : isProfileLoading || (!!authService.getAccessToken() && !appUser) ? (
+                ) : isProfileLoading ||
+                  (!!authService.getAccessToken() && !appUser) ? (
                   <div className="h-10 rounded-full bg-muted animate-pulse" />
                 ) : (
                   <Button
@@ -347,7 +344,8 @@ export function Navbar() {
                 email={dropdownUser.email || undefined}
                 onLogoutSuccess={handleLogoutSuccess}
               />
-            ) : isProfileLoading || (!!authService.getAccessToken() && !appUser) ? (
+            ) : isProfileLoading ||
+              (!!authService.getAccessToken() && !appUser) ? (
               <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
             ) : (
               <Button

@@ -17,9 +17,9 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button 
-        variant="ghost" 
-        size="icon" 
+      <Button
+        variant="ghost"
+        size="icon"
         className="relative h-9 w-9 rounded-full"
         disabled
       >
@@ -32,9 +32,9 @@ export function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon" 
+        <Button
+          variant="ghost"
+          size="icon"
           className="relative h-9 w-9 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
         >
           <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-amber-500" />
@@ -42,30 +42,36 @@ export function ThemeToggle() {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[120px]">
-        <DropdownMenuItem 
+      <DropdownMenuContent align="end" className="min-w-30">
+        <DropdownMenuItem
           onClick={() => setTheme("light")}
           className="flex items-center gap-2 cursor-pointer"
         >
           <Sun className="h-4 w-4 text-amber-500" />
           <span>Light</span>
-          {theme === "light" && <span className="ml-auto text-indigo-600">✓</span>}
+          {theme === "light" && (
+            <span className="ml-auto text-indigo-600">✓</span>
+          )}
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setTheme("dark")}
           className="flex items-center gap-2 cursor-pointer"
         >
           <Moon className="h-4 w-4 text-indigo-400" />
           <span>Dark</span>
-          {theme === "dark" && <span className="ml-auto text-indigo-600">✓</span>}
+          {theme === "dark" && (
+            <span className="ml-auto text-indigo-600">✓</span>
+          )}
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setTheme("system")}
           className="flex items-center gap-2 cursor-pointer"
         >
           <Monitor className="h-4 w-4 text-gray-500" />
           <span>System</span>
-          {theme === "system" && <span className="ml-auto text-indigo-600">✓</span>}
+          {theme === "system" && (
+            <span className="ml-auto text-indigo-600">✓</span>
+          )}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -12,7 +12,6 @@ import {
   ParticleField,
 } from "@/components/ui/floating-elements";
 import { CountingNumber } from "@/components/ui/counting-number";
-import { NewYearBanner } from "@/components/ui/new-year-banner";
 import {
   Sparkles,
   Languages,
@@ -34,9 +33,6 @@ export default function Home() {
       <FloatingElements className="opacity-30 dark:opacity-20" count={6} />
 
       <Navbar />
-
-      {/* New Year Banner */}
-      <NewYearBanner />
 
       {/* Hero Section - Centered Layout */}
       <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20 lg:py-24 relative">
