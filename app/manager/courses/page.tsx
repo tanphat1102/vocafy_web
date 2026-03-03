@@ -25,6 +25,7 @@ import {
 import { Plus, Edit, Trash2, Search, Eye } from "lucide-react";
 import { courseService, type Course } from "@/services";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 type DialogMode = "create" | "edit" | "view" | null;
 
@@ -48,8 +49,9 @@ export default function ManagerCoursesPage() {
       const response = await courseService.list({ page, size: 10 });
       setCourses(response.result.content);
       setTotalPages(response.result.total_pages);
-    } catch (error) {
-      console.error("Failed to fetch courses:", error);
+    } catch (err) {
+      console.error("Failed to fetch courses:", err);
+      toast.error((err as Error).message || "Failed to load courses");
     } finally {
       setIsLoading(false);
     }
@@ -93,9 +95,10 @@ export default function ManagerCoursesPage() {
       }
       closeDialog();
       fetchCourses();
-    } catch (error) {
-      console.error("Failed to save course:", error);
-      alert("Failed to save course");
+      toast.success("Course saved successfully");
+    } catch (err) {
+      console.error("Failed to save course:", err);
+      toast.error((err as Error).message || "Failed to save course");
     }
   };
 
@@ -105,9 +108,10 @@ export default function ManagerCoursesPage() {
     try {
       await courseService.delete(id);
       fetchCourses();
-    } catch (error) {
-      console.error("Failed to delete course:", error);
-      alert("Failed to delete course");
+      toast.success("Course deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete course:", err);
+      toast.error((err as Error).message || "Failed to delete course");
     }
   };
 

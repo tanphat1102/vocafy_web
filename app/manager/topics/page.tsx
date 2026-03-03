@@ -25,6 +25,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Search, Eye } from "lucide-react";
 import { topicService, type Topic } from "@/services";
+import { toast } from "sonner";
 
 type DialogMode = "create" | "edit" | "view" | null;
 
@@ -48,8 +49,9 @@ export default function ManagerTopicsPage() {
       const response = await topicService.list({ page, size: 10 });
       setTopics(response.result.content);
       setTotalPages(response.result.total_pages);
-    } catch (error) {
-      console.error("Failed to fetch topics:", error);
+    } catch (err) {
+      console.error("Failed to fetch topics:", err);
+      toast.error((err as Error).message || "Failed to load topics");
     } finally {
       setIsLoading(false);
     }
@@ -97,9 +99,10 @@ export default function ManagerTopicsPage() {
       }
       closeDialog();
       fetchTopics();
-    } catch (error) {
-      console.error("Failed to save topic:", error);
-      alert("Failed to save topic");
+      toast.success("Topic saved successfully");
+    } catch (err) {
+      console.error("Failed to save topic:", err);
+      toast.error((err as Error).message || "Failed to save topic");
     }
   };
 
@@ -109,9 +112,10 @@ export default function ManagerTopicsPage() {
     try {
       await topicService.delete(id);
       fetchTopics();
-    } catch (error) {
-      console.error("Failed to delete topic:", error);
-      alert("Failed to delete topic");
+      toast.success("Topic deleted successfully");
+    } catch (err) {
+      console.error("Failed to delete topic:", err);
+      toast.error((err as Error).message || "Failed to delete topic");
     }
   };
 
