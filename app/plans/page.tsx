@@ -28,6 +28,10 @@ import {
   type PremiumPackage,
 } from "@/services/premiumPackageService";
 import { authService } from "@/services/authService";
+import {
+  subscriptionService,
+  type Subscription,
+} from "@/services/subscriptionService";
 import type { ApiError } from "@/services";
 import Image from "next/image";
 
@@ -71,15 +75,28 @@ export default function PlansPage() {
   const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
   const [isCheckingTransaction, setIsCheckingTransaction] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
 
   useEffect(() => {
-    const fetchPackages = async () => {
+    const fetchData = async () => {
       try {
         const response = await premiumPackageService
           .listActivePackages({ size: 100 })
           .catch(() => premiumPackageService.list({ size: 100 }));
         if (response.success && response.result.content) {
           setPackages(response.result.content);
+        }
+
+        // Fetch user subscription if logged in
+        if (authService.getAccessToken()) {
+          try {
+            const subscriptionData =
+              await subscriptionService.getMySubscription();
+            setSubscription(subscriptionData);
+          } catch {
+            // User might not have a subscription yet
+            console.log("No subscription found");
+          }
         }
       } catch (error) {
         console.error("Failed to fetch premium packages:", error);
@@ -89,7 +106,7 @@ export default function PlansPage() {
       }
     };
 
-    fetchPackages();
+    fetchData();
   }, []);
 
   const parsePaymentUrlInfo = (
@@ -377,17 +394,27 @@ export default function PlansPage() {
                       )}
                     </div>
 
-                    <Button
-                      className="w-full bg-primary hover:bg-primary/90"
-                      onClick={() => handleSubscribe(pkg)}
-                      disabled={
-                        isGeneratingPayment && selectedPackage?.id === pkg.id
-                      }
-                    >
-                      {isGeneratingPayment && selectedPackage?.id === pkg.id
-                        ? "Generating QR..."
-                        : "Get Subscription"}
-                    </Button>
+                    {subscription && subscription.plan !== "FREE" ? (
+                      <Button
+                        className="w-full"
+                        variant="outline"
+                        disabled
+                      >
+                        Already Subscribed
+                      </Button>
+                    ) : (
+                      <Button
+                        className="w-full bg-primary hover:bg-primary/90"
+                        onClick={() => handleSubscribe(pkg)}
+                        disabled={
+                          isGeneratingPayment && selectedPackage?.id === pkg.id
+                        }
+                      >
+                        {isGeneratingPayment && selectedPackage?.id === pkg.id
+                          ? "Generating QR..."
+                          : "Get Subscription"}
+                      </Button>
+                    )}
 
                     <div className="space-y-2 sm:space-y-3">
                       {DEFAULT_FEATURES.map((feature, index) => (
