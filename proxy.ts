@@ -23,8 +23,7 @@ function decodeToken(token: string): DecodedToken | null {
     const padding = base64.length % 4;
     const padded = padding ? base64 + "=".repeat(4 - padding) : base64;
 
-    // In Node.js environment, use Buffer instead of atob
-    const decoded = Buffer.from(padded, "base64").toString("utf-8");
+    const decoded = atob(padded);
     return JSON.parse(decoded) as DecodedToken;
   } catch (error) {
     console.error("Failed to decode token:", error);
@@ -53,20 +52,11 @@ function getUserRole(token: string): string | null {
   return null;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Get access token from cookies or local storage (we'll use cookies for server-side)
   const accessToken = request.cookies.get("vocafy:accessToken")?.value;
-
-  // Public routes that don't require authentication
-  const publicRoutes = [
-    "/login",
-    "/register",
-    "/",
-    "/contact",
-    "/introduction",
-  ];
 
   // Static files and API routes
   if (

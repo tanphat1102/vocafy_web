@@ -12,9 +12,11 @@ import {
   Users,
   BookOpen,
   Library,
-  TrendingUp,
   DollarSign,
   Activity,
+  MessageSquareMore,
+  ArrowUpRight,
+  Star,
 } from "lucide-react";
 import {
   BarChart,
@@ -31,6 +33,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { feedbackService, type RatingSummary } from "@/services";
 
 interface Stats {
   totalUsers: number;
@@ -38,7 +41,6 @@ interface Stats {
   totalVocabularies: number;
   activeEnrollments: number;
   totalRevenue: number;
-  growthRate: number;
 }
 
 export default function AdminDashboard() {
@@ -48,27 +50,41 @@ export default function AdminDashboard() {
     totalVocabularies: 0,
     activeEnrollments: 0,
     totalRevenue: 0,
-    growthRate: 0,
+  });
+  const [ratingSummary, setRatingSummary] = useState<RatingSummary>({
+    total_ratings: 0,
+    rating_5: 0,
+    rating_4: 0,
+    rating_3: 0,
+    rating_2: 0,
+    rating_1: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Fetch stats from API
-    // For now, using mock data
-    setTimeout(() => {
-      setStats({
-        totalUsers: 1234,
-        totalSyllabuses: 45,
-        totalVocabularies: 15678,
-        activeEnrollments: 892,
-        totalRevenue: 25000,
-        growthRate: 12.5,
-      });
-      setIsLoading(false);
-    }, 500);
+    const fetchDashboardData = async () => {
+      try {
+        setStats({
+          totalUsers: 1234,
+          totalSyllabuses: 45,
+          totalVocabularies: 15678,
+          activeEnrollments: 892,
+          totalRevenue: 25000,
+        });
+
+        const ratingSummaryResponse =
+          await feedbackService.getAdminRatingSummary();
+        setRatingSummary(ratingSummaryResponse.result);
+      } catch (error) {
+        console.error("Failed to fetch admin dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
-  // Chart data for revenue by month
   const revenueData = [
     { month: "Jan", revenue: 4000, users: 240 },
     { month: "Feb", revenue: 3000, users: 221 },
@@ -79,13 +95,11 @@ export default function AdminDashboard() {
     { month: "Jul", revenue: 3490, users: 210 },
   ];
 
-  // Chart data for user distribution
   const userDistributionData = [
     { name: "Active Users", value: 892, fill: "var(--color-chart-1)" },
     { name: "Inactive Users", value: 342, fill: "var(--color-chart-2)" },
   ];
 
-  // Chart data for content distribution
   const contentData = [
     { name: "Syllabuses", value: 45, fill: "var(--color-chart-3)" },
     { name: "Topics", value: 234, fill: "var(--color-chart-4)" },
@@ -100,6 +114,7 @@ export default function AdminDashboard() {
       bgColor: "bg-chart-1/10",
       iconColor: "text-chart-1",
       change: "+12%",
+      changeLabel: "vs last month",
     },
     {
       name: "Syllabuses",
@@ -108,6 +123,7 @@ export default function AdminDashboard() {
       bgColor: "bg-chart-2/10",
       iconColor: "text-chart-2",
       change: "+5%",
+      changeLabel: "vs last month",
     },
     {
       name: "Vocabularies",
@@ -116,6 +132,7 @@ export default function AdminDashboard() {
       bgColor: "bg-chart-3/10",
       iconColor: "text-chart-3",
       change: "+18%",
+      changeLabel: "vs last month",
     },
     {
       name: "Active Enrollments",
@@ -124,6 +141,7 @@ export default function AdminDashboard() {
       bgColor: "bg-chart-4/10",
       iconColor: "text-chart-4",
       change: "+8%",
+      changeLabel: "vs last month",
     },
     {
       name: "Total Revenue",
@@ -132,16 +150,29 @@ export default function AdminDashboard() {
       bgColor: "bg-chart-5/10",
       iconColor: "text-chart-5",
       change: "+15%",
-    },
-    {
-      name: "Growth Rate",
-      value: `${stats.growthRate}%`,
-      icon: TrendingUp,
-      bgColor: "bg-primary/10",
-      iconColor: "text-primary",
-      change: "+2.5%",
+      changeLabel: "vs last month",
     },
   ];
+
+  const ratingRows = [
+    { label: "5", count: ratingSummary.rating_5, color: "bg-emerald-500" },
+    { label: "4", count: ratingSummary.rating_4, color: "bg-lime-500" },
+    { label: "3", count: ratingSummary.rating_3, color: "bg-sky-500" },
+    { label: "2", count: ratingSummary.rating_2, color: "bg-amber-500" },
+    { label: "1", count: ratingSummary.rating_1, color: "bg-rose-500" },
+  ];
+
+  const averageRating =
+    ratingSummary.total_ratings > 0
+      ? (
+          (ratingSummary.rating_5 * 5 +
+            ratingSummary.rating_4 * 4 +
+            ratingSummary.rating_3 * 3 +
+            ratingSummary.rating_2 * 2 +
+            ratingSummary.rating_1) /
+          ratingSummary.total_ratings
+        ).toFixed(1)
+      : "0.0";
 
   if (isLoading) {
     return (
@@ -153,45 +184,105 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+      <div className="rounded-2xl border border-border bg-linear-to-r from-primary/10 via-background to-chart-1/10 p-6">
+        <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
         <p className="mt-2 text-muted-foreground">
-          Welcome to the admin dashboard
+          Overview of platform health, user activity, and feedback quality
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {statsCards.map((stat) => (
-          <Card
-            key={stat.name}
-            className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-200 bg-card"
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {stat.name}
-                  </p>
-                  <p className="mt-2 text-3xl font-bold text-foreground">
-                    {stat.value}
-                  </p>
-                  <p className="mt-2 text-sm text-primary/80 font-medium">
-                    {stat.change} from last month
-                  </p>
+      <div className="grid gap-6 xl:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 xl:col-span-2">
+          {statsCards.map((stat) => (
+            <Card
+              key={stat.name}
+              className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-200 bg-card"
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {stat.name}
+                    </p>
+                    <p className="mt-2 text-3xl font-bold text-foreground">
+                      {stat.value}
+                    </p>
+                    <p className="mt-2 inline-flex items-center gap-1 text-sm text-primary/80 font-medium">
+                      <ArrowUpRight className="h-4 w-4" />
+                      {stat.change} {stat.changeLabel}
+                    </p>
+                  </div>
+                  <div className={`rounded-full p-3 ${stat.bgColor}`}>
+                    <stat.icon className={`h-8 w-8 ${stat.iconColor}`} />
+                  </div>
                 </div>
-                <div className={`rounded-full p-3 ${stat.bgColor}`}>
-                  <stat.icon className={`h-8 w-8 ${stat.iconColor}`} />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <Card className="border-0 shadow-sm bg-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquareMore className="h-5 w-5 text-primary" />
+              Rating Summary
+            </CardTitle>
+            <CardDescription>Visual feedback distribution</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <span className="text-xl font-bold">{averageRating}</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  {ratingSummary.total_ratings.toLocaleString()} ratings
+                </p>
+                <div className="mt-1 flex items-center gap-1 text-amber-500">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star
+                      key={index}
+                      className={`h-4 w-4 ${
+                        index < Math.round(Number(averageRating))
+                          ? "fill-current"
+                          : ""
+                      }`}
+                    />
+                  ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+            </div>
+
+            <div className="space-y-3">
+              {ratingRows.map((row) => {
+                const percent =
+                  ratingSummary.total_ratings > 0
+                    ? (row.count / ratingSummary.total_ratings) * 100
+                    : 0;
+
+                return (
+                  <div key={row.label} className="grid grid-cols-[16px_1fr_42px] items-center gap-2">
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {row.label}
+                    </span>
+                    <div className="h-2 rounded-full bg-muted">
+                      <div
+                        className={`h-2 rounded-full ${row.color} transition-all duration-500`}
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-muted-foreground text-right">
+                      {row.count}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Charts Section */}
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Revenue Chart */}
         <Card className="border-0 shadow-sm bg-card">
           <CardHeader>
             <CardTitle>Revenue & User Growth</CardTitle>
@@ -226,7 +317,6 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* User Trend Chart */}
         <Card className="border-0 shadow-sm bg-card">
           <CardHeader>
             <CardTitle>User Activity Trend</CardTitle>
@@ -259,7 +349,6 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* User Distribution */}
         <Card className="border-0 shadow-sm bg-card">
           <CardHeader>
             <CardTitle>User Status</CardTitle>
@@ -293,7 +382,6 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Content Distribution */}
         <Card className="border-0 shadow-sm bg-card">
           <CardHeader>
             <CardTitle>Content Distribution</CardTitle>
@@ -328,7 +416,6 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      {/* Recent Activity */}
       <Card className="border-0 shadow-sm bg-card">
         <CardContent className="p-6">
           <h2 className="mb-4 text-xl font-bold text-foreground">
