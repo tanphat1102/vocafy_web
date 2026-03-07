@@ -17,6 +17,7 @@ import {
   MessageSquareMore,
   ArrowUpRight,
   Star,
+  TrendingUp,
 } from "lucide-react";
 import {
   BarChart,
@@ -33,7 +34,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { feedbackService, type RatingSummary } from "@/services";
+import {
+  dashboardService,
+  feedbackService,
+  type RatingSummary,
+} from "@/services";
 
 interface Stats {
   totalUsers: number;
@@ -41,6 +46,7 @@ interface Stats {
   totalVocabularies: number;
   activeEnrollments: number;
   totalRevenue: number;
+  growthRate: number;
 }
 
 export default function AdminDashboard() {
@@ -50,6 +56,7 @@ export default function AdminDashboard() {
     totalVocabularies: 0,
     activeEnrollments: 0,
     totalRevenue: 0,
+    growthRate: 0,
   });
   const [ratingSummary, setRatingSummary] = useState<RatingSummary>({
     total_ratings: 0,
@@ -70,11 +77,28 @@ export default function AdminDashboard() {
           totalVocabularies: 15678,
           activeEnrollments: 892,
           totalRevenue: 25000,
+          growthRate: 0,
         });
 
-        const ratingSummaryResponse =
-          await feedbackService.getAdminRatingSummary();
+        const [ratingSummaryResponse, growthRatesResponse] = await Promise.all([
+          feedbackService.getAdminRatingSummary(),
+          dashboardService.getGrowthRates(),
+        ]);
         setRatingSummary(ratingSummaryResponse.result);
+
+        const growthResult = growthRatesResponse.result;
+        const averageGrowthRate =
+          (growthResult.user_growth_rate +
+            growthResult.syllabus_growth_rate +
+            growthResult.vocabulary_growth_rate +
+            growthResult.active_enrollment_growth_rate +
+            growthResult.revenue_growth_rate) /
+          5;
+
+        setStats((previousStats) => ({
+          ...previousStats,
+          growthRate: Number(averageGrowthRate.toFixed(2)),
+        }));
       } catch (error) {
         console.error("Failed to fetch admin dashboard data:", error);
       } finally {
@@ -150,6 +174,15 @@ export default function AdminDashboard() {
       bgColor: "bg-chart-5/10",
       iconColor: "text-chart-5",
       change: "+15%",
+      changeLabel: "vs last month",
+    },
+    {
+      name: "Growth Rate",
+      value: `${stats.growthRate}%`,
+      icon: TrendingUp,
+      bgColor: "bg-primary/10",
+      iconColor: "text-primary",
+      change: "+2.5%",
       changeLabel: "vs last month",
     },
   ];
