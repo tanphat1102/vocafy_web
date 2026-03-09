@@ -395,11 +395,7 @@ export default function PlansPage() {
                     </div>
 
                     {subscription && subscription.plan !== "FREE" ? (
-                      <Button
-                        className="w-full"
-                        variant="outline"
-                        disabled
-                      >
+                      <Button className="w-full" variant="outline" disabled>
                         Already Subscribed
                       </Button>
                     ) : (
