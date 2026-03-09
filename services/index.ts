@@ -11,4 +11,5 @@ export * from "./paymentMethodService";
 export * from "./premiumPackageService";
 export * from "./userService";
 export * from "./subscriptionService";
+export * from "./feedbackService";
 export * from "./dashboardService";

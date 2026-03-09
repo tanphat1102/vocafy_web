@@ -10,6 +10,7 @@ import {
   Languages,
   CreditCard,
   Receipt,
+  MessageSquare,
 } from "lucide-react";
 import SideBar, { NavigationItem } from "./sideBar";
 
@@ -25,6 +26,7 @@ const adminNavigation: NavigationItem[] = [
     href: "/admin/subscription-transactions",
     icon: Receipt,
   },
+  { name: "Feedbacks", href: "/admin/feedbacks", icon: MessageSquare },
   { name: "Users", href: "/admin/users", icon: Users },
 ];
 

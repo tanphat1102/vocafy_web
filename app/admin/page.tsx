@@ -15,6 +15,9 @@ import {
   TrendingUp,
   DollarSign,
   Activity,
+  MessageSquareMore,
+  Star,
+  ArrowUpRight,
 } from "lucide-react";
 import {
   BarChart,
@@ -31,7 +34,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { dashboardService } from "@/services";
+import {
+  dashboardService,
+  feedbackService,
+  type RatingSummary,
+} from "@/services";
 
 interface Stats {
   totalUsers: number;
@@ -83,6 +90,14 @@ export default function AdminDashboard() {
       reportMonth: now.getMonth() + 1,
     };
   });
+  const [ratingSummary, setRatingSummary] = useState<RatingSummary>({
+    total_ratings: 0,
+    rating_5: 0,
+    rating_4: 0,
+    rating_3: 0,
+    rating_2: 0,
+    rating_1: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -101,6 +116,7 @@ export default function AdminDashboard() {
           revenueResponse,
           growthRatesResponse,
           activeEnrollmentsResponse,
+          ratingSummaryResponse,
         ] = await Promise.all([
           dashboardService.getVocabularies(params),
           dashboardService.getUsers(params),
@@ -108,6 +124,18 @@ export default function AdminDashboard() {
           dashboardService.getRevenue(params),
           dashboardService.getGrowthRates(params),
           dashboardService.getActiveEnrollments(params),
+          feedbackService.getAdminRatingSummary().catch(() => ({
+            success: false,
+            message: "Failed to fetch rating summary",
+            result: {
+              total_ratings: 0,
+              rating_5: 0,
+              rating_4: 0,
+              rating_3: 0,
+              rating_2: 0,
+              rating_1: 0,
+            },
+          })),
         ]);
 
         setStats({
@@ -139,6 +167,10 @@ export default function AdminDashboard() {
             params.month,
           ),
         });
+
+        if (ratingSummaryResponse.success) {
+          setRatingSummary(ratingSummaryResponse.result);
+        }
       } catch (error) {
         console.error("Failed to fetch dashboard statistics:", error);
       } finally {
@@ -214,6 +246,26 @@ export default function AdminDashboard() {
     },
   ];
 
+  const ratingRows = [
+    { label: "5⭐", count: ratingSummary.rating_5, color: "bg-emerald-500" },
+    { label: "4⭐", count: ratingSummary.rating_4, color: "bg-lime-500" },
+    { label: "3⭐", count: ratingSummary.rating_3, color: "bg-sky-500" },
+    { label: "2⭐", count: ratingSummary.rating_2, color: "bg-amber-500" },
+    { label: "1⭐", count: ratingSummary.rating_1, color: "bg-rose-500" },
+  ];
+
+  const averageRating =
+    ratingSummary.total_ratings > 0
+      ? (
+          (ratingSummary.rating_5 * 5 +
+            ratingSummary.rating_4 * 4 +
+            ratingSummary.rating_3 * 3 +
+            ratingSummary.rating_2 * 2 +
+            ratingSummary.rating_1) /
+          ratingSummary.total_ratings
+        ).toFixed(1)
+      : "0.0";
+
   // Chart data for revenue by month
   const revenueData = [
     { month: "Jan", revenue: 4000, users: 240 },
@@ -256,32 +308,99 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {statsCards.map((stat) => (
-          <Card
-            key={stat.name}
-            className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-200 bg-card"
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {stat.name}
-                  </p>
-                  <p className="mt-2 text-3xl font-bold text-foreground">
-                    {stat.value}
-                  </p>
-                  <p className="mt-2 text-sm text-primary/80 font-medium">
-                    {stat.change} from last month
-                  </p>
+      <div className="grid gap-6 xl:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 xl:col-span-2">
+          {statsCards.map((stat) => (
+            <Card
+              key={stat.name}
+              className="overflow-hidden border-0 shadow-sm hover:shadow-md transition-all duration-200 bg-card"
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {stat.name}
+                    </p>
+                    <p className="mt-2 text-3xl font-bold text-foreground">
+                      {stat.value}
+                    </p>
+                    <p className="mt-2 inline-flex items-center gap-1 text-sm text-primary/80 font-medium">
+                      <ArrowUpRight className="h-4 w-4" />
+                      {stat.change} from last month
+                    </p>
+                  </div>
+                  <div className={`rounded-full p-3 ${stat.bgColor}`}>
+                    <stat.icon className={`h-8 w-8 ${stat.iconColor}`} />
+                  </div>
                 </div>
-                <div className={`rounded-full p-3 ${stat.bgColor}`}>
-                  <stat.icon className={`h-8 w-8 ${stat.iconColor}`} />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Rating Summary Card */}
+        <Card className="border-0 shadow-sm bg-card">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquareMore className="h-5 w-5 text-primary" />
+              Rating Summary
+            </CardTitle>
+            <CardDescription>Visual feedback distribution</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <span className="text-xl font-bold">{averageRating}</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">
+                  {ratingSummary.total_ratings.toLocaleString()} ratings
+                </p>
+                <div className="mt-1 flex items-center gap-1 text-amber-500">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star
+                      key={index}
+                      className={`h-4 w-4 ${
+                        index < Math.round(Number(averageRating))
+                          ? "fill-current"
+                          : ""
+                      }`}
+                    />
+                  ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        ))}
+            </div>
+
+            <div className="space-y-3">
+              {ratingRows.map((row) => {
+                const percent =
+                  ratingSummary.total_ratings > 0
+                    ? (row.count / ratingSummary.total_ratings) * 100
+                    : 0;
+
+                return (
+                  <div
+                    key={row.label}
+                    className="grid grid-cols-[32px_1fr_42px] items-center gap-2"
+                  >
+                    <span className="text-xs font-semibold text-muted-foreground">
+                      {row.label}
+                    </span>
+                    <div className="h-2 rounded-full bg-muted">
+                      <div
+                        className={`h-2 rounded-full ${row.color} transition-all duration-500`}
+                        style={{ width: `${percent}%` }}
+                      />
+                    </div>
+                    <span className="text-xs text-muted-foreground text-right">
+                      {row.count}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Charts Section */}
