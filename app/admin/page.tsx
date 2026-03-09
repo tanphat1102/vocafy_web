@@ -485,9 +485,7 @@ export default function AdminDashboard() {
                 <Pie
                   data={userDistributionData}
                   cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: ${value}`}
+                  cy="45%"
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -496,6 +494,11 @@ export default function AdminDashboard() {
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
+                  wrapperStyle={{ paddingTop: "10px" }}
+                />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "var(--card)",
@@ -519,9 +522,7 @@ export default function AdminDashboard() {
                 <Pie
                   data={contentData}
                   cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: ${value}`}
+                  cy="45%"
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -530,6 +531,11 @@ export default function AdminDashboard() {
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
+                <Legend
+                  verticalAlign="bottom"
+                  height={36}
+                  wrapperStyle={{ paddingTop: "10px" }}
+                />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "var(--card)",
