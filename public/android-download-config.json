@@ -1,0 +1,33 @@
+{
+  "title": "Download Vocafy for Android",
+  "description": "Choose the download method that works best for your device.",
+  "options": [
+    {
+      "id": "direct-download",
+      "label": "Download AAB file",
+      "description": "Download the Android App Bundle directly from the Vocafy website.",
+      "href": "/app-release/app-release.aab",
+      "buttonLabel": "Download AAB",
+      "badge": "Direct",
+      "download": true
+    },
+    {
+      "id": "apkpure",
+      "label": "Get APK from APKPure",
+      "description": "Open APKPure to download the APK version for Android installation.",
+      "href": "https://apkpure.com/p/com.exe201.vocafy_mobile",
+      "buttonLabel": "Get APK",
+      "badge": "APK",
+      "external": true
+    },
+    {
+      "id": "google-play",
+      "label": "Download from Google Play",
+      "description": "The Google Play link will be updated later.",
+      "href": "",
+      "buttonLabel": "Coming soon",
+      "badge": "Google Play",
+      "external": true
+    }
+  ]
+}

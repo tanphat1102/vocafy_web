@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { AndroidDownloadDialog } from "@/components/home/android-download-dialog";
 import { FadeInOnScroll } from "@/components/ui/fade-in-on-scroll";
 import { MouseFollowImage } from "@/components/ui/mouse-follow-image";
 import {
@@ -19,7 +20,6 @@ import {
   RefreshCcw,
   ArrowRight,
   Smartphone,
-  Download,
   CheckCircle2,
   BookOpen,
   Brain,
@@ -373,14 +373,14 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-4 pt-4">
-                <Button className="bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600">
-                  <Download className="w-5 h-5 mr-2" />
-                  App Store
+                <Button
+                  disabled
+                  className="bg-gray-300 text-gray-600 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-800"
+                >
+                  <Smartphone className="w-5 h-5 mr-2" />
+                  iOS Coming Soon
                 </Button>
-                <Button className="bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600">
-                  <Download className="w-5 h-5 mr-2" />
-                  Google Play
-                </Button>
+                <AndroidDownloadDialog />
               </div>
             </FadeInOnScroll>
           </div>
