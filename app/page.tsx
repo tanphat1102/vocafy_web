@@ -371,7 +371,7 @@ export default function Home() {
               <div className="flex flex-wrap gap-4 pt-4">
                 <Button
                   disabled
-                  className="bg-gray-300 text-gray-600 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-800"
+                  className="h-12 rounded-full bg-gray-300 text-gray-600 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-800"
                 >
                   <Smartphone className="w-5 h-5 mr-2" />
                   iOS Coming Soon
