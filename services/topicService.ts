@@ -4,6 +4,7 @@ import type { Course } from "./courseService";
 export interface Topic {
   id: number;
   syllabus_id: number;
+  created_by_user_id?: string;
   title: string;
   description?: string;
   total_days: number;
@@ -67,6 +68,22 @@ class TopicService {
     size?: number;
   }): Promise<TopicListResponse> {
     return apiClient.get<TopicListResponse>("/topics", params);
+  }
+
+  /**
+   * List topics by syllabus ID
+   */
+  async listBySyllabus(
+    syllabusId: number,
+    params?: {
+      page?: number;
+      size?: number;
+    },
+  ): Promise<TopicListResponse> {
+    return apiClient.get<TopicListResponse>(
+      `/topics/by-syllabus/${syllabusId}`,
+      params,
+    );
   }
 
   /**

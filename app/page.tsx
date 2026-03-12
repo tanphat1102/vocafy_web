@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +26,129 @@ import {
   Target,
   Zap,
 } from "lucide-react";
+import {
+  authService,
+  courseService,
+  dashboardService,
+  syllabusService,
+  topicService,
+  vocabularyService,
+} from "@/services";
+
+interface LandingMetrics {
+  totalUsers: number | null;
+  totalSyllabuses: number;
+  totalTopics: number;
+  totalCourses: number;
+  totalVocabularies: number;
+}
+
+const toSafeNumber = (value: unknown, fallback = 0): number => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return fallback;
+};
 
 export default function Home() {
+  const [metrics, setMetrics] = useState<LandingMetrics>({
+    totalUsers: null,
+    totalSyllabuses: 0,
+    totalTopics: 0,
+    totalCourses: 0,
+    totalVocabularies: 0,
+  });
+  const [isMetricsLoading, setIsMetricsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchLandingMetrics = async () => {
+      try {
+        const [syllabusesResponse, topicsResponse, coursesResponse, vocabResponse] =
+          await Promise.all([
+            syllabusService.list({ page: 0, size: 1 }),
+            topicService.list({ page: 0, size: 1 }),
+            courseService.list({ page: 0, size: 1 }),
+            vocabularyService.list({ page: 0, size: 1 }),
+          ]);
+
+        let totalUsers: number | null = null;
+        if (authService.getAccessToken()) {
+          try {
+            const now = new Date();
+            const usersResponse = await dashboardService.getUsers({
+              year: now.getFullYear(),
+              month: now.getMonth() + 1,
+            });
+            totalUsers = toSafeNumber(usersResponse.result.count, 0);
+          } catch {
+            totalUsers = null;
+          }
+        }
+
+        if (!isMounted) {
+          return;
+        }
+
+        setMetrics({
+          totalUsers,
+          totalSyllabuses: toSafeNumber(
+            syllabusesResponse.result.total_elements,
+            0,
+          ),
+          totalTopics: toSafeNumber(topicsResponse.result.total_elements, 0),
+          totalCourses: toSafeNumber(coursesResponse.result.total_elements, 0),
+          totalVocabularies: toSafeNumber(vocabResponse.result.total_elements, 0),
+        });
+      } catch (error) {
+        console.error("Failed to fetch landing metrics:", error);
+      } finally {
+        if (isMounted) {
+          setIsMetricsLoading(false);
+        }
+      }
+    };
+
+    fetchLandingMetrics();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const sectionMetrics = [
+    { value: metrics.totalSyllabuses, label: "Syllabuses" },
+    { value: metrics.totalCourses, label: "Courses" },
+    { value: metrics.totalVocabularies, label: "Vocabularies" },
+  ];
+
+  const mobileMetrics = [
+    { value: metrics.totalTopics, label: "Topics" },
+    {
+      value: metrics.totalUsers ?? metrics.totalSyllabuses,
+      label: metrics.totalUsers !== null ? "Active Users" : "Public Syllabuses",
+    },
+  ];
+
+  const trustedMetrics = [
+    {
+      value: metrics.totalUsers ?? metrics.totalSyllabuses,
+      label: metrics.totalUsers !== null ? "Active Users" : "Public Learners",
+    },
+    { value: metrics.totalSyllabuses, label: "Syllabuses" },
+    { value: metrics.totalCourses, label: "Courses" },
+    { value: metrics.totalVocabularies, label: "Vocabularies" },
+  ];
+
   return (
     <div className="bg-background">
       {/* Floating background elements */}
@@ -151,30 +273,24 @@ export default function Home() {
                 learning that evolves with you.
               </p>
               <div className="flex items-center gap-4 sm:gap-6 md:gap-8 pt-2 sm:pt-4">
-                <div className="text-center">
-                  <p className="text-2xl sm:text-3xl font-bold text-indigo-600 dark:text-indigo-400">
-                    <CountingNumber value={95} suffix="%" />
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                    Accuracy
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl sm:text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                    <CountingNumber value={3} suffix="x" />
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                    Faster Learning
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl sm:text-3xl font-bold text-purple-600 dark:text-purple-400">
-                    <CountingNumber value={10} suffix="K+" />
-                  </p>
-                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                    Users
-                  </p>
-                </div>
+                {sectionMetrics.map((item, index) => (
+                  <div key={item.label} className="text-center">
+                    <p
+                      className={`text-2xl sm:text-3xl font-bold ${
+                        index === 0
+                          ? "text-indigo-600 dark:text-indigo-400"
+                          : index === 1
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-purple-600 dark:text-purple-400"
+                      }`}
+                    >
+                      <CountingNumber value={item.value} suffix="+" />
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                      {item.label}
+                    </p>
+                  </div>
+                ))}
               </div>
             </FadeInOnScroll>
 
@@ -351,22 +467,22 @@ export default function Home() {
                 all devices and study even when you&apos;re offline.
               </p>
               <div className="flex items-center gap-8 pt-4">
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                    <CountingNumber value={10} suffix="K+" />
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Downloads
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-pink-600 dark:text-pink-400">
-                    <CountingNumber value={4.8} decimals={1} />
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Rating
-                  </p>
-                </div>
+                {mobileMetrics.map((item, index) => (
+                  <div key={item.label} className="text-center">
+                    <p
+                      className={`text-3xl font-bold ${
+                        index === 0
+                          ? "text-purple-600 dark:text-purple-400"
+                          : "text-pink-600 dark:text-pink-400"
+                      }`}
+                    >
+                      <CountingNumber value={item.value} suffix="+" />
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {item.label}
+                    </p>
+                  </div>
+                ))}
               </div>
               <div className="flex flex-wrap gap-4 pt-4">
                 <Button
@@ -391,29 +507,22 @@ export default function Home() {
         <div className="container mx-auto px-4 relative z-10">
           <FadeInOnScroll className="text-center text-white mb-8 sm:mb-10 md:mb-12">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-4">
-              Trusted by Thousands of Learners
+              Trusted by Real Platform Data
             </h2>
             <p className="text-base sm:text-lg text-indigo-100 max-w-2xl mx-auto px-4">
-              Join our growing community and start your language learning
-              journey today.
+              Live counters from Vocafy API.{" "}
+              {isMetricsLoading
+                ? "Loading latest numbers..."
+                : "Updated from current database totals."}
             </p>
           </FadeInOnScroll>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-            {[
-              { value: 10000, suffix: "+", label: "Active Users" },
-              { value: 50000, suffix: "+", label: "Vocabularies" },
-              { value: 95, suffix: "%", label: "Success Rate" },
-              { value: 4.8, decimals: 1, label: "App Rating" },
-            ].map((stat, i) => (
+            {trustedMetrics.map((stat, i) => (
               <FadeInOnScroll key={i} delay={i * 100}>
                 <div className="text-center">
                   <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-1 sm:mb-2">
-                    <CountingNumber
-                      value={stat.value}
-                      suffix={stat.suffix}
-                      decimals={stat.decimals}
-                    />
+                    <CountingNumber value={stat.value} suffix="+" />
                   </p>
                   <p className="text-xs sm:text-sm md:text-base text-indigo-200">
                     {stat.label}
