@@ -22,6 +22,7 @@ import {
   Shield,
   Edit,
   LogOut,
+  MessageSquare,
   Activity,
   Clock,
   Crown,
@@ -37,6 +38,7 @@ import { Footer } from "@/components/layout/footer";
 import { CloudinaryUpload } from "@/components/ui/cloudinary-upload";
 import { toast } from "sonner";
 import {
+  authService,
   userService,
   subscriptionService,
   premiumPackageService,
@@ -46,7 +48,6 @@ import {
   type PaymentUrlResponse,
 } from "@/services";
 import { auth } from "@/lib/firebase";
-import { signOut } from "firebase/auth";
 
 interface ParsedPaymentInfo {
   bank: string;
@@ -83,7 +84,13 @@ export default function ProfilePage() {
   useEffect(() => {
     const unsubscribe = auth?.onAuthStateChanged((authUser) => {
       if (!authUser) {
-        router.push("/login");
+        (async () => {
+          try {
+            await authService.signInWithGoogleAndSync();
+          } catch {
+            router.push("/");
+          }
+        })();
         return;
       }
       fetchUserProfile();
@@ -273,9 +280,7 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      if (auth) {
-        await signOut(auth);
-      }
+      await authService.logout();
       router.push("/");
     } catch (error) {
       console.error("Failed to logout:", error);
@@ -325,15 +330,26 @@ export default function ProfilePage() {
                 View and manage your personal information
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="gap-2 text-destructive hover:bg-destructive hover:text-destructive-foreground"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => router.push("/my-feedback")}
+              >
+                <MessageSquare className="h-4 w-4" />
+                My Feedback
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
           </div>
 
           {/* Profile Card */}

@@ -3,6 +3,7 @@ import { apiClient } from "./apiClient";
 export interface Course {
   id: number;
   topic_id: number;
+  created_by_user_id?: string;
   title: string;
   description?: string;
   sort_order: number;
@@ -62,6 +63,19 @@ class CourseService {
     size?: number;
   }): Promise<CourseListResponse> {
     return apiClient.get<CourseListResponse>("/courses", params);
+  }
+
+  /**
+   * List courses by topic ID
+   */
+  async listByTopic(
+    topicId: number,
+    params?: {
+      page?: number;
+      size?: number;
+    },
+  ): Promise<CourseListResponse> {
+    return apiClient.get<CourseListResponse>(`/courses/by-topic/${topicId}`, params);
   }
 
   /**

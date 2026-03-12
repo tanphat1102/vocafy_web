@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,6 +33,7 @@ import {
 } from "@/services/subscriptionService";
 import type { ApiError } from "@/services";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const DEFAULT_FEATURES = [
   "All languages, always",
@@ -58,6 +58,8 @@ interface ParsedPaymentInfo {
   transferContent: string;
 }
 
+const PAYMENT_SUCCESS_STORAGE_KEY = "plans_payment_success";
+
 export default function PlansPage() {
   const router = useRouter();
   const [billingPeriod, setBillingPeriod] = useState<
@@ -74,8 +76,12 @@ export default function PlansPage() {
     useState<PaymentUrlResponse | null>(null);
   const [isGeneratingPayment, setIsGeneratingPayment] = useState(false);
   const [isCheckingTransaction, setIsCheckingTransaction] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [vipCongratsDialogOpen, setVipCongratsDialogOpen] = useState(false);
+
+  const isQrPaymentSupported = billingPeriod === "monthly";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,6 +115,18 @@ export default function PlansPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const shouldOpenCongratsDialog =
+      window.localStorage.getItem(PAYMENT_SUCCESS_STORAGE_KEY) === "1";
+
+    if (shouldOpenCongratsDialog) {
+      window.localStorage.removeItem(PAYMENT_SUCCESS_STORAGE_KEY);
+      setVipCongratsDialogOpen(true);
+    }
+  }, []);
+
   const parsePaymentUrlInfo = (
     payment: PaymentUrlResponse | null,
   ): ParsedPaymentInfo | null => {
@@ -135,6 +153,13 @@ export default function PlansPage() {
   };
 
   const handleSubscribe = async (pkg: PremiumPackage) => {
+    if (!isQrPaymentSupported) {
+      toast.info(
+        "Annual and lifetime QR payments are under development. Please use the monthly plan for now.",
+      );
+      return;
+    }
+
     setSelectedPackage(pkg);
 
     if (!authService.getAccessToken()) {
@@ -170,6 +195,24 @@ export default function PlansPage() {
     }
   };
 
+  const handleGoogleSignInForPayment = async () => {
+    try {
+      setIsAuthLoading(true);
+      await authService.signInWithGoogleAndSync();
+      setLoginDialogOpen(false);
+      toast.success("Signed in with Google.");
+
+      if (selectedPackage) {
+        await handleSubscribe(selectedPackage);
+      }
+    } catch (error) {
+      console.error("Google sign-in failed:", error);
+      toast.error("Google sign-in failed. Please try again.");
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
   const handleCopy = async (value: string, field: string) => {
     if (!value) return;
 
@@ -195,12 +238,11 @@ export default function PlansPage() {
         premiumPackageService.isTransactionSuccessful(response);
 
       if (isSuccessful) {
-        toast.success(
-          "Subscription activated successfully. The page will reload shortly.",
-        );
+        window.localStorage.setItem(PAYMENT_SUCCESS_STORAGE_KEY, "1");
+        toast.success("Subscription activated. Reloading page...");
         setTimeout(() => {
           window.location.reload();
-        }, 1800);
+        }, 900);
         return;
       }
 
@@ -403,13 +445,24 @@ export default function PlansPage() {
                         className="w-full bg-primary hover:bg-primary/90"
                         onClick={() => handleSubscribe(pkg)}
                         disabled={
+                          !isQrPaymentSupported ||
                           isGeneratingPayment && selectedPackage?.id === pkg.id
                         }
                       >
-                        {isGeneratingPayment && selectedPackage?.id === pkg.id
+                        {!isQrPaymentSupported
+                          ? "Coming soon"
+                          : isGeneratingPayment &&
+                              selectedPackage?.id === pkg.id
                           ? "Generating QR..."
                           : "Get Subscription"}
                       </Button>
+                    )}
+
+                    {!isQrPaymentSupported && (
+                      <p className="text-xs text-muted-foreground">
+                        Annual and lifetime QR payments are under development.
+                        Please use monthly for now.
+                      </p>
                     )}
 
                     <div className="space-y-2 sm:space-y-3">
@@ -685,12 +738,43 @@ export default function PlansPage() {
                   Cancel
                 </Button>
                 <Button
+                  onClick={handleGoogleSignInForPayment}
+                  disabled={isAuthLoading}
+                >
+                  {isAuthLoading ? "Signing in..." : "Sign in with Google"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog
+            open={vipCongratsDialogOpen}
+            onOpenChange={setVipCongratsDialogOpen}
+          >
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-xl">
+                  Congratulations, VIP MEMBER!
+                </DialogTitle>
+                <DialogDescription>
+                  You are now a VIP MEMBER. Please rate your experience and
+                  share why you upgraded.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setVipCongratsDialogOpen(false)}
+                >
+                  Later
+                </Button>
+                <Button
                   onClick={() => {
-                    setLoginDialogOpen(false);
-                    router.push("/login?redirect=/plans");
+                    setVipCongratsDialogOpen(false);
+                    router.push("/my-feedback");
                   }}
                 >
-                  Go to Login
+                  Go to My Feedback
                 </Button>
               </div>
             </DialogContent>

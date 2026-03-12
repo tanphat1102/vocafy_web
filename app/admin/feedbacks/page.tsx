@@ -93,11 +93,15 @@ export default function AdminFeedbacksPage() {
 
   const filteredFeedbacks = feedbacks.filter((feedback) => {
     const normalizedSearch = searchTerm.toLowerCase();
+    const displayName = (feedback.user_display_name || "").toLowerCase();
+    const title = (feedback.title || "").toLowerCase();
+    const content = (feedback.content || "").toLowerCase();
+
     return (
-      feedback.user_display_name.toLowerCase().includes(normalizedSearch) ||
+      displayName.includes(normalizedSearch) ||
       feedback.user_email.toLowerCase().includes(normalizedSearch) ||
-      feedback.title.toLowerCase().includes(normalizedSearch) ||
-      feedback.content.toLowerCase().includes(normalizedSearch)
+      title.includes(normalizedSearch) ||
+      content.includes(normalizedSearch)
     );
   });
 
@@ -166,17 +170,21 @@ export default function AdminFeedbacksPage() {
                 <TableRow key={feedback.id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{feedback.user_display_name}</p>
+                      <p className="font-medium">
+                        {feedback.user_display_name || "Anonymous user"}
+                      </p>
                       <p className="text-xs text-muted-foreground">
                         {feedback.user_email}
                       </p>
                     </div>
                   </TableCell>
                   <TableCell>{renderStars(feedback.rating)}</TableCell>
-                  <TableCell className="font-medium">{feedback.title}</TableCell>
+                  <TableCell className="font-medium">
+                    {feedback.title || "Untitled feedback"}
+                  </TableCell>
                   <TableCell className="max-w-sm">
                     <p className="line-clamp-2 text-sm text-muted-foreground">
-                      {feedback.content}
+                      {feedback.content || "No content"}
                     </p>
                   </TableCell>
                   <TableCell>
@@ -192,7 +200,9 @@ export default function AdminFeedbacksPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {new Date(feedback.created_at).toLocaleString()}
+                    {feedback.created_at
+                      ? new Date(feedback.created_at).toLocaleString()
+                      : "N/A"}
                   </TableCell>
                   <TableCell className="text-right">
                     <Button
@@ -240,7 +250,8 @@ export default function AdminFeedbacksPage() {
           <DialogHeader>
             <DialogTitle>Feedback Conversation</DialogTitle>
             <DialogDescription>
-              {selectedFeedback?.user_display_name} ({selectedFeedback?.user_email})
+              {selectedFeedback?.user_display_name || "Anonymous user"} (
+              {selectedFeedback?.user_email})
             </DialogDescription>
           </DialogHeader>
 
@@ -250,11 +261,15 @@ export default function AdminFeedbacksPage() {
                 <div className="flex justify-start">
                   <div className="max-w-[80%] rounded-2xl rounded-bl-sm bg-white px-4 py-3 text-sm shadow-sm">
                     <p className="mb-1 font-semibold text-foreground">
-                      {selectedFeedback.title}
+                      {selectedFeedback.title || "Untitled feedback"}
                     </p>
-                    <p className="text-muted-foreground">{selectedFeedback.content}</p>
+                    <p className="text-muted-foreground">
+                      {selectedFeedback.content || "No content"}
+                    </p>
                     <p className="mt-2 text-xs text-muted-foreground">
-                      {new Date(selectedFeedback.created_at).toLocaleString()}
+                      {selectedFeedback.created_at
+                        ? new Date(selectedFeedback.created_at).toLocaleString()
+                        : "N/A"}
                     </p>
                   </div>
                 </div>

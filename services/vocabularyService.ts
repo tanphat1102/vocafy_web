@@ -123,6 +123,22 @@ class VocabularyService {
   }
 
   /**
+   * List vocabularies by course ID
+   */
+  async listByCourse(
+    courseId: number,
+    params?: {
+      page?: number;
+      size?: number;
+    },
+  ): Promise<VocabularyListResponse> {
+    return apiClient.get<VocabularyListResponse>(
+      `/vocabularies/by-course/${courseId}`,
+      params,
+    );
+  }
+
+  /**
    * Create new vocabulary
    */
   async create(request: VocabularyCreateRequest): Promise<VocabularyResponse> {

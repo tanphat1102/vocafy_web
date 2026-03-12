@@ -227,15 +227,15 @@ export default function RegisterPage() {
             </Button>
           </div>
 
-          {/* Login Link */}
+          {/* Home Link */}
           <div className="text-center mt-6">
             <p className="text-gray-600">
-              Already have an account?{" "}
+              Prefer Google sign-in?{" "}
               <Link
-                href="/login"
+                href="/"
                 className="text-primary hover:text-primary/80 font-medium"
               >
-                Sign in
+                Go to Home
               </Link>
             </p>
           </div>

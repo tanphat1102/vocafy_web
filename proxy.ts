@@ -22,11 +22,12 @@ export function proxy(request: NextRequest) {
   const isAdminRoute = pathname.startsWith("/admin");
   const isManagerRoute = pathname.startsWith("/manager");
 
-  // If accessing protected route without token, redirect to login
+  // If accessing protected route without token, redirect to home for Google sign-in
   if ((isAdminRoute || isManagerRoute) && !accessToken) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+    const homeUrl = new URL("/", request.url);
+    homeUrl.searchParams.set("redirect", pathname);
+    homeUrl.searchParams.set("auth", "google");
+    return NextResponse.redirect(homeUrl);
   }
 
   // Check role-based access

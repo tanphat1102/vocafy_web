@@ -3,17 +3,17 @@ import { apiClient } from "./apiClient";
 export interface Feedback {
   id: number;
   user_id: string;
-  user_display_name: string;
+  user_display_name: string | null;
   user_email: string;
   rating: number;
-  title: string;
-  content: string;
+  title: string | null;
+  content: string | null;
   admin_reply: string | null;
   replied_by_user_id: string | null;
   replied_by_email: string | null;
   replied_at: string | null;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 export interface FeedbackListResponse {
@@ -45,11 +45,43 @@ export interface RatingSummaryResponse {
   result: RatingSummary;
 }
 
+export interface FeedbackCreateRequest {
+  rating: number;
+  title?: string;
+  content?: string;
+}
+
 interface ReplyFeedbackRequest {
   admin_reply: string;
 }
 
 class FeedbackService {
+  async listAll(params?: {
+    page?: number;
+    size?: number;
+  }): Promise<FeedbackListResponse> {
+    return apiClient.get<FeedbackListResponse>("/feedbacks", params);
+  }
+
+  async listMine(params?: {
+    page?: number;
+    size?: number;
+  }): Promise<FeedbackListResponse> {
+    return apiClient.get<FeedbackListResponse>("/feedbacks/me", params);
+  }
+
+  async create(request: FeedbackCreateRequest): Promise<{
+    success: boolean;
+    message: string;
+    result: Feedback;
+  }> {
+    return apiClient.post<{
+      success: boolean;
+      message: string;
+      result: Feedback;
+    }>("/feedbacks", request);
+  }
+
   async listAdmin(params?: {
     page?: number;
     size?: number;
