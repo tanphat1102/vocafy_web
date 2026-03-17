@@ -1,4 +1,5 @@
-import { getStoredAccessToken } from "@/lib/auth-storage";
+import { AUTH_STATE_CHANGED_EVENT } from "@/lib/auth-constants";
+import { clearAuthTokens, getStoredAccessToken } from "@/lib/auth-storage";
 import { API_BASE_URL } from "./config";
 
 type QueryParams = Record<string, string | number | boolean | undefined | null>;
@@ -6,6 +7,16 @@ type QueryParams = Record<string, string | number | boolean | undefined | null>;
 interface ApiError {
   message: string;
   status?: number;
+}
+
+function clearAuthStateOnUnauthorized(status: number): void {
+  if (status !== 401) return;
+
+  clearAuthTokens();
+
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(AUTH_STATE_CHANGED_EVENT));
+  }
 }
 
 class ApiClient {
@@ -56,6 +67,8 @@ class ApiClient {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
+      clearAuthStateOnUnauthorized(response.status);
+
       const error: ApiError = {
         message: response.statusText,
         status: response.status,

@@ -183,21 +183,28 @@ async function refreshAccessToken(): Promise<string> {
   const refreshToken = getRefreshToken();
 
   if (!refreshToken) {
+    removeTokensFromLocalStorage();
     throw new Error("No refresh token available");
   }
 
-  const { accessToken, refreshToken: newRefreshToken } =
-    await postAuthEndpoint<AuthTokenPair>(
-      "/auth/refresh",
-      {
-        refresh_token: refreshToken,
-      },
-      "Failed to refresh token",
-    );
+  try {
+    const { accessToken, refreshToken: newRefreshToken } =
+      await postAuthEndpoint<AuthTokenPair>(
+        "/auth/refresh",
+        {
+          refresh_token: refreshToken,
+        },
+        "Failed to refresh token",
+      );
 
-  saveTokensToLocalStorage(accessToken, newRefreshToken);
+    saveTokensToLocalStorage(accessToken, newRefreshToken);
 
-  return accessToken;
+    return accessToken;
+  } catch (error) {
+    // Refresh token is likely invalid/expired after long inactivity.
+    removeTokensFromLocalStorage();
+    throw error;
+  }
 }
 
 function getUserInfoFromToken(): DecodedToken | null {
