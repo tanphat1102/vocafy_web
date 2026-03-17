@@ -1,339 +1,638 @@
 "use client";
 
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { FadeInOnScroll } from "@/components/ui/fade-in-on-scroll";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import {
+  syllabusService,
+  vocabularyService,
+  type Course,
+  type Syllabus,
+  type Vocabulary,
+} from "@/services";
 import {
   BookOpen,
-  GraduationCap,
-  Target,
-  CheckCircle2,
-  ArrowRight,
+  Check,
+  Clock3,
+  Filter,
+  Languages,
+  Loader2,
+  Search,
+  Sparkles,
 } from "lucide-react";
 
-const jlptLevels = [
-  {
-    level: "N5",
-    title: "Beginner",
-    color: "from-emerald-400 to-teal-400",
-    bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
-    textColor: "text-emerald-600 dark:text-emerald-400",
-    words: 800,
-    kanji: 100,
-    duration: "2-3 months",
-    topics: [
-      "Hiragana & Katakana",
-      "Basic Greetings",
-      "Numbers & Time",
-      "Daily Conversations",
-    ],
-  },
-  {
-    level: "N4",
-    title: "Elementary",
-    color: "from-blue-400 to-cyan-400",
-    bgColor: "bg-blue-50 dark:bg-blue-950/30",
-    textColor: "text-blue-600 dark:text-blue-400",
-    words: 1500,
-    kanji: 300,
-    duration: "3-4 months",
-    topics: [
-      "Grammar Patterns",
-      "Verb Conjugations",
-      "Everyday Situations",
-      "Reading Practice",
-    ],
-  },
-  {
-    level: "N3",
-    title: "Intermediate",
-    color: "from-purple-400 to-pink-400",
-    bgColor: "bg-purple-50 dark:bg-purple-950/30",
-    textColor: "text-purple-600 dark:text-purple-400",
-    words: 3000,
-    kanji: 650,
-    duration: "4-6 months",
-    topics: [
-      "Complex Grammar",
-      "Reading Comprehension",
-      "Listening Skills",
-      "Essay Writing",
-    ],
-  },
-  {
-    level: "N2",
-    title: "Advanced",
-    color: "from-orange-400 to-red-400",
-    bgColor: "bg-orange-50 dark:bg-orange-950/30",
-    textColor: "text-orange-600 dark:text-orange-400",
-    words: 6000,
-    kanji: 1000,
-    duration: "6-8 months",
-    topics: [
-      "Business Japanese",
-      "News & Articles",
-      "Advanced Kanji",
-      "Formal Expressions",
-    ],
-  },
-  {
-    level: "N1",
-    title: "Expert",
-    color: "from-rose-400 to-pink-400",
-    bgColor: "bg-rose-50 dark:bg-rose-950/30",
-    textColor: "text-rose-600 dark:text-rose-400",
-    words: 10000,
-    kanji: 2000,
-    duration: "8-12 months",
-    topics: [
-      "Academic Japanese",
-      "Literature",
-      "Professional Communication",
-      "Cultural Nuances",
-    ],
-  },
-];
+type SortOption = "newest" | "title_asc" | "title_desc" | "days_asc" | "days_desc";
+type DurationFilter = "all" | "short" | "medium" | "long";
 
-const englishCourses = [
-  {
-    title: "TOEIC Preparation",
-    description:
-      "Master business English and ace your TOEIC exam with comprehensive vocabulary and practice tests.",
-    color: "from-indigo-400 to-blue-400",
-    features: [
-      "500+ Business Terms",
-      "Listening Practice",
-      "Reading Strategies",
-      "Mock Tests",
-    ],
-  },
-  {
-    title: "IELTS Academic",
-    description:
-      "Prepare for IELTS with academic vocabulary, writing techniques, and speaking practice.",
-    color: "from-teal-400 to-emerald-400",
-    features: [
-      "Academic Vocabulary",
-      "Essay Writing",
-      "Speaking Practice",
-      "Band Score Tips",
-    ],
-  },
-  {
-    title: "Business English",
-    description: "Professional communication skills for the modern workplace.",
-    color: "from-amber-400 to-orange-400",
-    features: [
-      "Email Writing",
-      "Presentations",
-      "Negotiations",
-      "Meeting Skills",
-    ],
-  },
-];
+function getPrimaryTerm(vocabulary: Vocabulary): string {
+  return vocabulary.terms[0]?.text_value || "No term";
+}
+
+function getPrimaryMeaning(vocabulary: Vocabulary): string {
+  return vocabulary.meanings[0]?.meaning_text || "No meaning";
+}
+
+function getPrimaryLanguage(vocabulary: Vocabulary): string {
+  return vocabulary.terms[0]?.language_code || "N/A";
+}
 
 export default function SyllabusPage() {
+  const [syllabuses, setSyllabuses] = useState<Syllabus[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [searchText, setSearchText] = useState("");
+  const [selectedLanguageSets, setSelectedLanguageSets] = useState<string[]>([]);
+  const [selectedVisibilities, setSelectedVisibilities] = useState<string[]>([]);
+  const [selectedDuration, setSelectedDuration] = useState<DurationFilter>("all");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
+
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailSyllabus, setDetailSyllabus] = useState<Syllabus | null>(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
+
+  const [expandedTopicIds, setExpandedTopicIds] = useState<number[]>([]);
+  const [expandedCourseIds, setExpandedCourseIds] = useState<number[]>([]);
+  const [courseVocabularyMap, setCourseVocabularyMap] = useState<
+    Record<number, Vocabulary[]>
+  >({});
+  const [loadingVocabularyCourseIds, setLoadingVocabularyCourseIds] = useState<
+    number[]
+  >([]);
+
+  useEffect(() => {
+    const fetchSyllabuses = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await syllabusService.list({ page: 0, size: 200 });
+        setSyllabuses(response.result.content || []);
+      } catch (err) {
+        console.error("Failed to fetch syllabuses:", err);
+        setError("Cannot load syllabuses from API.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSyllabuses();
+  }, []);
+
+  const languageSetOptions = useMemo(
+    () =>
+      Array.from(new Set(syllabuses.map((item) => item.language_set))).sort((a, b) =>
+        a.localeCompare(b),
+      ),
+    [syllabuses],
+  );
+
+  const visibilityOptions = useMemo(
+    () => Array.from(new Set(syllabuses.map((item) => item.visibility))),
+    [syllabuses],
+  );
+
+  const filteredSyllabuses = useMemo(() => {
+    const normalizedSearch = searchText.trim().toLowerCase();
+
+    const filtered = syllabuses.filter((item) => {
+      const matchesSearch =
+        normalizedSearch.length === 0 ||
+        item.title.toLowerCase().includes(normalizedSearch) ||
+        (item.description || "").toLowerCase().includes(normalizedSearch);
+
+      const matchesLanguage =
+        selectedLanguageSets.length === 0 ||
+        selectedLanguageSets.includes(item.language_set);
+
+      const matchesVisibility =
+        selectedVisibilities.length === 0 ||
+        selectedVisibilities.includes(item.visibility);
+
+      const matchesDuration =
+        selectedDuration === "all" ||
+        (selectedDuration === "short" && item.total_days <= 30) ||
+        (selectedDuration === "medium" && item.total_days > 30 && item.total_days <= 90) ||
+        (selectedDuration === "long" && item.total_days > 90);
+
+      return matchesSearch && matchesLanguage && matchesVisibility && matchesDuration;
+    });
+
+    const sorted = filtered.slice();
+
+    sorted.sort((a, b) => {
+      if (sortBy === "title_asc") {
+        return a.title.localeCompare(b.title);
+      }
+      if (sortBy === "title_desc") {
+        return b.title.localeCompare(a.title);
+      }
+      if (sortBy === "days_asc") {
+        return a.total_days - b.total_days;
+      }
+      if (sortBy === "days_desc") {
+        return b.total_days - a.total_days;
+      }
+
+      const aTime = new Date(a.created_at).getTime();
+      const bTime = new Date(b.created_at).getTime();
+      return bTime - aTime;
+    });
+
+    return sorted;
+  }, [searchText, selectedLanguageSets, selectedVisibilities, selectedDuration, sortBy, syllabuses]);
+
+  const toggleInArray = (
+    value: string,
+    setState: Dispatch<SetStateAction<string[]>>,
+  ) => {
+    setState((current) =>
+      current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value],
+    );
+  };
+
+  const openDetailModal = useCallback(async (syllabusId: number) => {
+    setDetailOpen(true);
+    setIsDetailLoading(true);
+
+    try {
+      const response = await syllabusService.getById(syllabusId);
+      setDetailSyllabus(response.result);
+
+      const sortedTopics = (response.result.topics || [])
+        .slice()
+        .sort((a, b) => a.sort_order - b.sort_order);
+
+      const firstTopicId = sortedTopics[0]?.id;
+      setExpandedTopicIds(firstTopicId ? [firstTopicId] : []);
+      setExpandedCourseIds([]);
+      setCourseVocabularyMap({});
+      setLoadingVocabularyCourseIds([]);
+    } catch (err) {
+      console.error("Failed to fetch syllabus detail:", err);
+      setDetailSyllabus(null);
+      setError("Cannot load syllabus detail right now.");
+    } finally {
+      setIsDetailLoading(false);
+    }
+  }, []);
+
+  const sortedTopics = (detailSyllabus?.topics || [])
+    .slice()
+    .sort((a, b) => a.sort_order - b.sort_order);
+
+  const isLoadingVocabularyForCourse = (courseId: number) =>
+    loadingVocabularyCourseIds.includes(courseId);
+
+  const loadVocabularyForCourse = useCallback(async (courseId: number) => {
+    if (courseVocabularyMap[courseId]) {
+      return;
+    }
+
+    setLoadingVocabularyCourseIds((current) => [...current, courseId]);
+
+    try {
+      const response = await vocabularyService.listByCourse(courseId, {
+        page: 0,
+        size: 50,
+      });
+
+      setCourseVocabularyMap((current) => ({
+        ...current,
+        [courseId]: response.result.content || [],
+      }));
+    } catch (err) {
+      console.error("Failed to fetch vocabularies for course:", err);
+      setCourseVocabularyMap((current) => ({
+        ...current,
+        [courseId]: [],
+      }));
+    } finally {
+      setLoadingVocabularyCourseIds((current) =>
+        current.filter((id) => id !== courseId),
+      );
+    }
+  }, [courseVocabularyMap]);
+
+  const toggleTopic = (topicId: number) => {
+    setExpandedTopicIds((current) =>
+      current.includes(topicId)
+        ? current.filter((id) => id !== topicId)
+        : [...current, topicId],
+    );
+  };
+
+  const toggleCourse = (course: Course) => {
+    const courseId = course.id;
+
+    setExpandedCourseIds((current) =>
+      current.includes(courseId)
+        ? current.filter((id) => id !== courseId)
+        : [...current, courseId],
+    );
+
+    if (!courseVocabularyMap[courseId]) {
+      loadVocabularyForCourse(courseId);
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchText("");
+    setSelectedLanguageSets([]);
+    setSelectedVisibilities([]);
+    setSelectedDuration("all");
+    setSortBy("newest");
+  };
+
   return (
-    <div className="bg-background">
+    <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-12 sm:py-16 md:py-20 lg:py-24">
-        <FadeInOnScroll className="text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
-          <Badge className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300 text-sm sm:text-base">
-            <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-            Learning Paths
+      <section className="border-b border-border bg-linear-to-r from-primary/10 via-background to-background py-12">
+        <div className="container mx-auto px-4 text-center">
+          <Badge variant="secondary" className="gap-2">
+            <Sparkles className="h-4 w-4" />
+            Vocafy Syllabus Catalog
           </Badge>
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight dark:text-white px-2">
-            Structured{" "}
-            <span className="text-indigo-600 dark:text-indigo-400">
-              Learning Syllabus
-            </span>
+          <h1 className="mt-4 text-3xl font-bold text-foreground sm:text-4xl">
+            Explore Learning Syllabuses
           </h1>
-
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-2">
-            Follow our carefully designed curriculum to master Japanese and
-            English vocabulary efficiently.
+          <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+            Browse by filters, compare syllabuses, and open full topic/course/
+            vocabulary details in one place.
           </p>
-        </FadeInOnScroll>
-      </section>
-
-      {/* JLPT Section */}
-      <section className="py-12 sm:py-16 dark:bg-gray-900 transition-colors duration-500">
-        <div className="container mx-auto px-4">
-          <FadeInOnScroll className="text-center mb-8 sm:mb-10 md:mb-12">
-            <Badge className="bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-300 mb-3 sm:mb-4 text-sm sm:text-base">
-              <BookOpen className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
-              Japanese Language
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold dark:text-white px-2">
-              JLPT Preparation Courses
-            </h2>
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-3 sm:mt-4 max-w-2xl mx-auto px-4">
-              From complete beginner to fluent speaker, our JLPT courses cover
-              all five levels.
-            </p>
-          </FadeInOnScroll>
-
-          <div className="grid gap-4 sm:gap-6 md:gap-8">
-            {jlptLevels.map((level, i) => (
-              <FadeInOnScroll key={level.level} delay={i * 100}>
-                <Card
-                  className={`${level.bgColor} border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1`}
-                >
-                  <CardContent className="p-6 md:p-8">
-                    <div className="grid md:grid-cols-4 gap-6 items-center">
-                      {/* Level Badge */}
-                      <div className="text-center md:text-left">
-                        <div
-                          className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-linear-to-br ${level.color} text-white text-3xl font-bold shadow-lg`}
-                        >
-                          {level.level}
-                        </div>
-                        <p className={`mt-2 font-semibold ${level.textColor}`}>
-                          {level.title}
-                        </p>
-                      </div>
-
-                      {/* Stats */}
-                      <div className="grid grid-cols-3 gap-4 text-center md:col-span-2">
-                        <div>
-                          <p className="text-2xl font-bold dark:text-white">
-                            {level.words.toLocaleString()}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Words
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold dark:text-white">
-                            {level.kanji}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Kanji
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-2xl font-bold dark:text-white">
-                            {level.duration}
-                          </p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Duration
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Topics */}
-                      <div className="space-y-2">
-                        {level.topics.map((topic) => (
-                          <div
-                            key={topic}
-                            className="flex items-center gap-2 text-sm"
-                          >
-                            <CheckCircle2
-                              className={`w-4 h-4 ${level.textColor}`}
-                            />
-                            <span className="text-gray-700 dark:text-gray-300">
-                              {topic}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </FadeInOnScroll>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* English Section */}
-      <section className="py-16 bg-indigo-50 dark:bg-indigo-950/20 transition-colors duration-500">
-        <div className="container mx-auto px-4">
-          <FadeInOnScroll className="text-center mb-12">
-            <Badge className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 mb-4">
-              <Target className="w-4 h-4 mr-2" />
-              English Language
-            </Badge>
-            <h2 className="text-3xl md:text-4xl font-bold dark:text-white">
-              English Proficiency Courses
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 mt-4 max-w-2xl mx-auto">
-              Boost your English skills for academic and professional success.
-            </p>
-          </FadeInOnScroll>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {englishCourses.map((course, i) => (
-              <FadeInOnScroll key={course.title} delay={i * 100}>
-                <Card className=" dark:bg-gray-800 border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 h-full">
-                  <CardHeader>
-                    <div
-                      className={`w-16 h-16 rounded-2xl bg-linear-to-br ${course.color} flex items-center justify-center text-white shadow-lg mb-4`}
-                    >
-                      <GraduationCap className="w-8 h-8" />
-                    </div>
-                    <CardTitle className="dark:text-white">
-                      {course.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-gray-600 dark:text-gray-300">
-                      {course.description}
-                    </p>
-                    <div className="space-y-2">
-                      {course.features.map((feature) => (
-                        <div
-                          key={feature}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <CheckCircle2 className="w-4 h-4 text-indigo-500" />
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {feature}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <Button className="w-full mt-4 group">
-                      Start Learning
-                      <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              </FadeInOnScroll>
-            ))}
+      <section className="container mx-auto px-4 py-8 sm:py-10">
+        {error ? (
+          <div className="mb-5 rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+            {error}
           </div>
-        </div>
-      </section>
+        ) : null}
 
-      {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-linear-to-br from-indigo-600 via-indigo-700 to-purple-700 relative overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
-          <FadeInOnScroll className="text-center text-white space-y-6 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold">
-              Ready to Start Your Learning Journey?
-            </h2>
-            <p className="text-lg text-indigo-100">
-              Join thousands of learners who have achieved their language goals
-              with Vocafy.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 pt-4">
-              <Button
-                size="lg"
-                className="bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-700 h-14 px-8 text-lg rounded-full"
-              >
-                Get Started Free
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+        <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+          <aside className="space-y-4 rounded-2xl border border-border bg-card p-4">
+            <div className="flex items-center gap-2 text-foreground">
+              <Filter className="h-4 w-4 text-primary" />
+              <p className="font-semibold">Filters</p>
             </div>
-          </FadeInOnScroll>
+
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Search</p>
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={searchText}
+                  onChange={(event) => setSearchText(event.target.value)}
+                  placeholder="Search syllabus..."
+                  className="pl-8"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Language Set</p>
+              <div className="space-y-1.5">
+                {languageSetOptions.map((language) => {
+                  const checked = selectedLanguageSets.includes(language);
+                  return (
+                    <button
+                      key={language}
+                      type="button"
+                      className="flex w-full items-center justify-between rounded-lg border border-border px-2.5 py-2 text-left text-sm hover:bg-muted/50"
+                      onClick={() => toggleInArray(language, setSelectedLanguageSets)}
+                    >
+                      <span className="text-foreground">{language}</span>
+                      {checked ? (
+                        <Check className="h-4 w-4 text-primary" />
+                      ) : (
+                        <span className="h-4 w-4 rounded border border-border" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Visibility</p>
+              <div className="space-y-1.5">
+                {visibilityOptions.map((visibility) => {
+                  const checked = selectedVisibilities.includes(visibility);
+                  return (
+                    <button
+                      key={visibility}
+                      type="button"
+                      className="flex w-full items-center justify-between rounded-lg border border-border px-2.5 py-2 text-left text-sm hover:bg-muted/50"
+                      onClick={() => toggleInArray(visibility, setSelectedVisibilities)}
+                    >
+                      <span className="text-foreground">{visibility}</span>
+                      {checked ? (
+                        <Check className="h-4 w-4 text-primary" />
+                      ) : (
+                        <span className="h-4 w-4 rounded border border-border" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Duration</p>
+              <select
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+                value={selectedDuration}
+                onChange={(event) =>
+                  setSelectedDuration(event.target.value as DurationFilter)
+                }
+              >
+                <option value="all">All durations</option>
+                <option value="short">Short (&lt;= 30 days)</option>
+                <option value="medium">Medium (31 - 90 days)</option>
+                <option value="long">Long (&gt; 90 days)</option>
+              </select>
+            </div>
+
+            <Button variant="outline" className="w-full" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          </aside>
+
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-4">
+              <p className="text-sm text-muted-foreground">
+                We found <span className="font-semibold text-primary">{filteredSyllabuses.length}</span> syllabuses for you
+              </p>
+
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Sort by:</span>
+                <select
+                  className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+                  value={sortBy}
+                  onChange={(event) => setSortBy(event.target.value as SortOption)}
+                >
+                  <option value="newest">Newest</option>
+                  <option value="title_asc">Title A-Z</option>
+                  <option value="title_desc">Title Z-A</option>
+                  <option value="days_asc">Duration: Low to High</option>
+                  <option value="days_desc">Duration: High to Low</option>
+                </select>
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="h-7 w-7 animate-spin text-primary" />
+              </div>
+            ) : filteredSyllabuses.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+                No syllabus matched your filters.
+              </div>
+            ) : (
+              <FadeInOnScroll>
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  {filteredSyllabuses.map((syllabus) => (
+                    <button
+                      key={syllabus.id}
+                      type="button"
+                      onClick={() => openDetailModal(syllabus.id)}
+                      className="group rounded-2xl border border-border bg-card p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-md"
+                    >
+                      <div className="mb-3 rounded-xl bg-linear-to-r from-primary/12 via-primary/5 to-transparent p-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <Badge variant="outline">#{syllabus.id}</Badge>
+                          <Badge variant="secondary">{syllabus.visibility}</Badge>
+                        </div>
+                        <h3 className="mt-2 line-clamp-2 text-lg font-semibold text-foreground">
+                          {syllabus.title}
+                        </h3>
+                      </div>
+
+                      <p className="line-clamp-2 text-sm text-muted-foreground">
+                        {syllabus.description || "No description"}
+                      </p>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                        <div className="rounded-lg border border-border bg-background px-2.5 py-2">
+                          <Clock3 className="mb-1 h-3.5 w-3.5 text-primary" />
+                          <span className="text-foreground">{syllabus.total_days} days</span>
+                        </div>
+                        <div className="rounded-lg border border-border bg-background px-2.5 py-2">
+                          <Languages className="mb-1 h-3.5 w-3.5 text-primary" />
+                          <span className="text-foreground">{syllabus.language_set}</span>
+                        </div>
+                      </div>
+
+                      <p className="mt-3 text-xs font-medium text-primary group-hover:underline">
+                        View details
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </FadeInOnScroll>
+            )}
+          </div>
         </div>
       </section>
+
+      <Dialog
+        open={detailOpen}
+        onOpenChange={(open) => {
+          setDetailOpen(open);
+          if (!open) {
+            setDetailSyllabus(null);
+            setExpandedTopicIds([]);
+            setExpandedCourseIds([]);
+            setCourseVocabularyMap({});
+            setLoadingVocabularyCourseIds([]);
+          }
+        }}
+      >
+        <DialogContent className="max-h-[88vh] overflow-y-auto sm:max-w-4xl">
+          {isDetailLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-7 w-7 animate-spin text-primary" />
+            </div>
+          ) : detailSyllabus ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>{detailSyllabus.title}</DialogTitle>
+                <DialogDescription>
+                  {detailSyllabus.description || "No description"}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div className="rounded-xl border border-border bg-muted/40 p-3 text-sm">
+                  <p className="text-muted-foreground">Duration</p>
+                  <p className="mt-1 font-semibold text-foreground">
+                    {detailSyllabus.total_days} days
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border bg-muted/40 p-3 text-sm">
+                  <p className="text-muted-foreground">Language Set</p>
+                  <p className="mt-1 font-semibold text-foreground">
+                    {detailSyllabus.language_set}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border bg-muted/40 p-3 text-sm">
+                  <p className="text-muted-foreground">Topics</p>
+                  <p className="mt-1 font-semibold text-foreground">
+                    {sortedTopics.length}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-3 space-y-3">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-primary" />
+                  <p className="text-sm font-semibold text-foreground">
+                    Topic, Course, Vocabulary Details
+                  </p>
+                </div>
+
+                {sortedTopics.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
+                    This syllabus has no topics yet.
+                  </div>
+                ) : (
+                  sortedTopics.map((topic, topicIndex) => {
+                    const courses = (topic.courses || [])
+                      .slice()
+                      .sort((a, b) => a.sort_order - b.sort_order);
+                    const topicExpanded = expandedTopicIds.includes(topic.id);
+
+                    return (
+                      <div
+                        key={topic.id}
+                        className="rounded-xl border border-border bg-card p-3"
+                      >
+                        <button
+                          type="button"
+                          className="flex w-full items-center justify-between gap-2 rounded-lg px-1 py-1 text-left"
+                          onClick={() => toggleTopic(topic.id)}
+                        >
+                          <div>
+                            <p className="text-xs text-muted-foreground">Topic {topicIndex + 1}</p>
+                            <p className="font-semibold text-foreground">{topic.title}</p>
+                          </div>
+                          <Badge variant="outline">{courses.length} courses</Badge>
+                        </button>
+
+                        {topicExpanded ? (
+                          <div className="mt-3 space-y-2 border-t border-border pt-3">
+                            <p className="text-sm text-muted-foreground">
+                              {topic.description || "No description"}
+                            </p>
+
+                            {courses.length === 0 ? (
+                              <p className="text-sm text-muted-foreground">No courses</p>
+                            ) : (
+                              courses.map((course, courseIndex) => {
+                                const courseExpanded = expandedCourseIds.includes(course.id);
+                                const vocabularies = courseVocabularyMap[course.id] || [];
+                                const loading = isLoadingVocabularyForCourse(course.id);
+
+                                return (
+                                  <div
+                                    key={course.id}
+                                    className="rounded-lg border border-border bg-background p-3"
+                                  >
+                                    <button
+                                      type="button"
+                                      className="flex w-full items-center justify-between gap-2 text-left"
+                                      onClick={() => toggleCourse(course)}
+                                    >
+                                      <div>
+                                        <p className="text-xs text-muted-foreground">
+                                          Course {courseIndex + 1}
+                                        </p>
+                                        <p className="font-medium text-foreground">{course.title}</p>
+                                      </div>
+                                      <Badge variant="secondary">Vocabulary</Badge>
+                                    </button>
+
+                                    {courseExpanded ? (
+                                      <div className="mt-3 space-y-2 border-t border-border pt-3">
+                                        <p className="text-sm text-muted-foreground">
+                                          {course.description || "No description"}
+                                        </p>
+
+                                        {loading ? (
+                                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            Loading vocabulary details...
+                                          </div>
+                                        ) : vocabularies.length === 0 ? (
+                                          <p className="text-sm text-muted-foreground">
+                                            No vocabularies in this course.
+                                          </p>
+                                        ) : (
+                                          <div className="space-y-2">
+                                            {vocabularies.map((vocabulary) => (
+                                              <div
+                                                key={vocabulary.id}
+                                                className="rounded-md border border-border bg-card px-3 py-2"
+                                              >
+                                                <div className="flex items-start justify-between gap-2">
+                                                  <p className="font-medium text-foreground">
+                                                    {getPrimaryTerm(vocabulary)}
+                                                  </p>
+                                                  <Badge variant="outline">
+                                                    {getPrimaryLanguage(vocabulary)}
+                                                  </Badge>
+                                                </div>
+                                                <p className="mt-1 text-sm text-muted-foreground">
+                                                  {getPrimaryMeaning(vocabulary)}
+                                                </p>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ) : null}
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </>
+          ) : (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              Failed to load syllabus details.
+            </p>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

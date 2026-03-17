@@ -5,15 +5,19 @@ export interface Syllabus {
   id: number;
   title: string;
   description: string;
+  image_background?: string | null;
+  image_icon?: string | null;
   total_days: number;
   language_set: string;
+  study_language?: string | null;
+  target_languages?: string[] | null;
   visibility: "PUBLIC" | "PRIVATE";
   source_type: string;
   created_by_user_id: string;
-  active: boolean;
-  is_deleted: boolean;
+  active: boolean | null;
+  is_deleted: boolean | null;
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
   topics: Topic[] | null;
 }
 

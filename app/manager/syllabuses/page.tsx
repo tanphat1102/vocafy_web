@@ -542,7 +542,7 @@ export default function ManagerSyllabusesPage() {
                 <div>
                   <Label className="text-gray-500">Updated At</Label>
                   <p className="mt-1 text-sm">
-                    {new Date(selectedSyllabus.updated_at).toLocaleString()}
+                    {selectedSyllabus.updated_at ? new Date(selectedSyllabus.updated_at).toLocaleString() : "N/A"}
                   </p>
                 </div>
               </div>
